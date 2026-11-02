@@ -343,7 +343,494 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
     return { total, active, frozen, banned, totalBalance, highVipCount };
   }, [users]);
 
-  const adminTabs = adminTabs.map(tab => {
+  const adminTabs = [
+            { id: 'overview', label: 'ওভারভিউ', icon: LayoutDashboard },
+            { id: 'users', label: 'প্লেয়ার ও ব্যালেন্স', icon: Users, badge: users.length },
+            { id: 'vip', label: 'ভিআইপি ক্লাব', icon: Crown },
+            { id: 'rewards_manager', label: 'পুরস্কার ও প্রচার', icon: Gift },
+            { id: 'transactions', label: 'ট্রানজেকশন প্রসেসিং', icon: CreditCard, badge: stats.pendingDepositsCount + stats.pendingWithdrawalsCount },
+            { id: 'games', label: 'গেম ইঞ্জিন ও RTP', icon: Gamepad2 },
+            { id: 'gateways', label: 'বিকাশ/নগদ গেটওয়ে', icon: Wallet },
+            { id: 'promotions', label: 'সাইটের নোটিশ', icon: Bell },
+            { id: 'messages', label: 'অভ্যন্তরীণ বার্তা', icon: Mail },
+            { id: 'support', label: 'সাপোর্ট টিকিট', icon: MessageSquare, badge: stats.pendingFeedbacksCount },
+            { id: 'livechat', label: 'লাইভ চ্যাট কনসোল', icon: Headphones, badge: liveChatBadge },
+            { id: 'referrals', label: 'রেফারেল ও এজেন্ট', icon: Share2 },
+            { id: 'master_api', label: 'ডাটাবেস ও ফাইল কন্ট্রোলার', icon: Server }
+          ];
+
+  // ====================================================
+  // USER ACTION HANDLERS
+  // ====================================================
+
+  // Execute User Balance Adjustment
+  const handleConfirmBalance = async () => {
+    if (!selectedUserForBalance || !balanceAmount) return;
+    const amt = parseFloat(balanceAmount);
+    if (isNaN(amt) || amt <= 0) {
+      alert('সঠিক টাকার পরিমাণ দিন');
+      return;
+    }
+
+    setIsSubmittingUserAction(true);
+    try {
+      const res = await api.admin.updateUserBalance(
+        selectedUserForBalance.id,
+        amt,
+        balanceActionType,
+        balanceNote
+      );
+
+      if (res.success) {
+        showToast(res.message);
+        setSelectedUserForBalance(null);
+        setBalanceAmount('');
+        loadData();
+        if (onRefreshSiteUser) onRefreshSiteUser();
+      }
+    } catch (e: any) {
+      alert(e.message || 'ব্যালেন্স আপডেট করতে ব্যর্থ হয়েছে');
+    } finally {
+      setIsSubmittingUserAction(false);
+    }
+  };
+
+  // Create New User
+  const handleCreateUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newUserData.username.trim() || !newUserData.phone.trim()) {
+      alert('ইউজারনেম এবং ফোন নম্বর অবশ্যই পূরণ করুন');
+      return;
+    }
+
+    setIsSubmittingUserAction(true);
+    try {
+      const res = await api.admin.createUser({
+        username: newUserData.username.trim(),
+        phone: newUserData.phone.trim(),
+        email: newUserData.email.trim() || undefined,
+        password: newUserData.password.trim() || '123456',
+        balance: parseFloat(newUserData.balance) || 0,
+        vipLevel: Number(newUserData.vipLevel) || 1,
+        realName: newUserData.realName.trim() || undefined
+      });
+
+      if (res.success) {
+        showToast('নতুন প্লেয়ার অ্যাকাউন্ট সফলভাবে তৈরি হয়েছে!');
+        setIsCreateUserModalOpen(false);
+        setNewUserData({
+          username: '',
+          phone: '',
+          email: '',
+          password: '',
+          balance: '1000',
+          vipLevel: 1,
+          realName: ''
+        });
+        loadData();
+      }
+    } catch (e: any) {
+      alert(e.message || 'নতুন ইউজার তৈরি করতে ব্যর্থ হয়েছে');
+    } finally {
+      setIsSubmittingUserAction(false);
+    }
+  };
+
+  // Open Full User Edit Modal
+  const handleOpenEditUser = (user: any) => {
+    setSelectedUserForEdit(user);
+    setEditFormData({
+      username: user.username || '',
+      realName: user.realName || '',
+      phone: user.phone || '',
+      email: user.email || '',
+      status: user.status || 'active',
+      passwordHash: user.passwordHash || '',
+      balance: user.balance !== undefined ? user.balance : 0,
+      vipLevel: user.vipLevel !== undefined ? user.vipLevel : 1,
+      vipExp: user.vipExp || 0,
+      freeSpins: user.freeSpins || 0,
+      goldenEggsAvailable: user.goldenEggsAvailable || 0,
+      redPacketsAvailable: user.redPacketsAvailable || 0
+    });
+  };
+
+  // Save Full User Edits
+  const handleSaveUserEdits = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUserForEdit) return;
+
+    setIsSubmittingUserAction(true);
+    try {
+      const res = await api.admin.updateUserFull(selectedUserForEdit.id, editFormData);
+
+      if (res.success) {
+        showToast('ইউজার প্রোফাইল ও কন্ট্রোল সফলভাবে আপডেট হয়েছে!');
+        setSelectedUserForEdit(null);
+        loadData();
+        if (onRefreshSiteUser) onRefreshSiteUser();
+      }
+    } catch (e: any) {
+      alert(e.message || 'আপডেট ব্যর্থ হয়েছে');
+    } finally {
+      setIsSubmittingUserAction(false);
+    }
+  };
+
+  // Quick Change Status
+  const handleQuickChangeStatus = async (userId: string, newStatus: 'active' | 'frozen' | 'banned') => {
+    try {
+      const res = await api.admin.updateUserStatus(userId, newStatus);
+      if (res.success) {
+        showToast(`একাউন্ট স্ট্যাটাস '${newStatus === 'active' ? 'সক্রিয়' : newStatus === 'frozen' ? 'স্থগিত' : 'নিষিদ্ধ'}' করা হয়েছে`);
+        loadData();
+      }
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
+
+  // Quick Change VIP
+  const handleChangeVip = async (userId: string, newVip: number) => {
+    try {
+      const res = await api.admin.updateUserVip(userId, newVip, newVip * 5000);
+      if (res.success) {
+        showToast(res.message);
+        loadData();
+      }
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
+
+  // Quick Add 5 Free Spins
+  const handleQuickAddSpins = async (userId: string, currentSpins: number) => {
+    try {
+      const newSpins = (currentSpins || 0) + 5;
+      const res = await api.admin.updateUserFull(userId, { freeSpins: newSpins });
+      if (res.success) {
+        showToast('+৫টি ফ্রি স্পিন যোগ করা হয়েছে!');
+        loadData();
+      }
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
+
+  // Reset User Cooldowns (Eggs & Spins)
+  const handleResetCooldowns = async (userId: string) => {
+    try {
+      const res = await api.admin.resetUserCooldowns(userId);
+      if (res.success) {
+        localStorage.removeItem('bengalbet_golden_egg_renew_until');
+        showToast('গোল্ডেন এগ ও ফ্রি স্পিন সফলভাবে আনলক ও রিফ্রেশ হয়েছে!');
+        loadData();
+      }
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
+
+  // Open Direct Message Modal
+  const handleOpenMessageModal = (user: any) => {
+    setSelectedUserForMessage(user);
+    setMessageTitle('অভিনন্দন! আপনার জন্য একটি বিশেষ নোটিশ / বোনাস');
+    setMessageContent(`প্রিয় ${user.username || 'প্লেয়ার'},\nআমাদের সাইটে সক্রিয় থাকার জন্য ধন্যবাদ! আপনার একাউন্টে বিশেষ সুবিধা যুক্ত করা হয়েছে। কোনো প্রয়োজনে আমাদের লাইভ সাপোর্টে যোগাযোগ করুন।`);
+    setMessageSender('Neext Hub Admin Support');
+  };
+
+  // Send Direct Message to User's Notification Center
+  const handleSendMessageSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedUserForMessage || !messageTitle.trim() || !messageContent.trim()) {
+      alert('শিরোনাম ও বিবরণ অবশ্যই পূরণ করুন');
+      return;
+    }
+
+    setIsSubmittingUserAction(true);
+    try {
+      const res = await api.admin.sendUserMessage(
+        selectedUserForMessage.id,
+        messageTitle.trim(),
+        messageContent.trim(),
+        messageSender.trim()
+      );
+      if (res.success) {
+        showToast('ইনবক্সে বার্তা ও নোটিফিকেশন সফলভাবে পাঠানো হয়েছে!');
+        setSelectedUserForMessage(null);
+        loadData();
+      }
+    } catch (e: any) {
+      alert(e.message || 'বার্তা পাঠানো সম্ভব হয়নি');
+    } finally {
+      setIsSubmittingUserAction(false);
+    }
+  };
+
+  // Open Detailed User Info Modal
+  const handleOpenUserDetails = async (user: any) => {
+    setSelectedUserForDetails({ user, loading: true });
+    setIsLoadingDetails(true);
+    try {
+      const res = await api.admin.getUserDetails(user.id);
+      if (res.success && res.details) {
+        setSelectedUserForDetails(res.details);
+      } else {
+        setSelectedUserForDetails({ user, stats: null, wallets: [], recentTransactions: [], recentBets: [] });
+      }
+    } catch (e) {
+      setSelectedUserForDetails({ user, stats: null, wallets: [], recentTransactions: [], recentBets: [] });
+    } finally {
+      setIsLoadingDetails(false);
+    }
+  };
+
+  // Confirm Delete User
+  const handleConfirmDeleteUser = async () => {
+    if (!userToDelete) return;
+
+    setIsSubmittingUserAction(true);
+    try {
+      const res = await api.admin.deleteUser(userToDelete.id);
+
+      if (res.success) {
+        showToast('ইউজার সফলভাবে মুছে ফেলা হয়েছে');
+        setUserToDelete(null);
+        loadData();
+        if (onRefreshSiteUser) onRefreshSiteUser();
+      }
+    } catch (e: any) {
+      alert(e.message || 'ইউজার মুছতে ব্যর্থ হয়েছে');
+    } finally {
+      setIsSubmittingUserAction(false);
+    }
+  };
+
+  // Export Users to JSON
+  const handleExportUsers = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(users, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `bengalbet_users_${new Date().toISOString().slice(0, 10)}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+    showToast('ইউজার তালিকা সফলভাবে এক্সপোর্ট করা হয়েছে!');
+  };
+
+  // Save Settings
+  const handleSaveSettings = async () => {
+    if (!settingsReady || isLoading) return;
+    setIsLoading(true);
+    setSettingsSaved(false);
+    setSettingsSaveError(null);
+    try {
+      const verified = await saveVerifiedSettings(settings, api.admin);
+      setSettings(prev => ({ ...prev, ...verified }));
+      setSettingsSaved(true);
+      showToast('সার্ভারের সেটিংস সংরক্ষণ নিশ্চিত হয়েছে!');
+    } catch (e: any) {
+      setSettingsSaveError(e.message || 'সংরক্ষণ যাচাই করা যায়নি।');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Reply Feedback
+  const handleSendFeedbackReply = async (id: string) => {
+    const text = replyInput[id];
+    if (!text || !text.trim()) return;
+    try {
+      const res = await api.admin.replyFeedback(id, text);
+      if (res.success) {
+        showToast('ফিডব্যাক উত্তর সফলভাবে পাঠানো হয়েছে');
+        setReplyInput(prev => ({ ...prev, [id]: '' }));
+        loadData();
+      }
+    } catch (e: any) {
+      alert(e.message);
+    }
+  };
+
+  // ----------------------------------------------------
+  // LOGIN SCREEN (If not authenticated)
+  // ----------------------------------------------------
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#04170f] text-white flex flex-col items-center justify-center p-4 selection:bg-yellow-400 selection:text-black">
+        {/* Background ambient lighting */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl" />
+          <div className="absolute bottom-1/4 left-1/2 -translate-x-1/2 w-80 h-80 bg-yellow-500/10 rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative w-full max-w-md bg-[#09291b] border border-emerald-500/40 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-xl">
+          <div className="text-center space-y-2 mb-6">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-yellow-500 to-amber-300 text-black shadow-lg shadow-yellow-500/20 mb-2">
+              <ShieldCheck className="w-9 h-9" />
+            </div>
+            <h1 className="text-2xl font-black tracking-wider text-white uppercase">
+              NEEXT HUB ADMIN
+            </h1>
+            <p className="text-xs text-emerald-300/80 font-medium">
+              BengalBet Master Management & Live Site Controller
+            </p>
+          </div>
+
+          <form onSubmit={handlePinSubmit} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-emerald-200 uppercase tracking-wider mb-2">
+                Admin Master Key
+              </label>
+              <div className="relative">
+                <input
+                  type="password"
+                  value={pinInput}
+                  onChange={(e) => {
+                    setPinInput(e.target.value);
+                    setPinError('');
+                  }}
+                  placeholder="Admin Master Key"
+                  className="w-full bg-[#051c13] border border-emerald-600/60 rounded-xl px-4 py-3.5 text-center text-lg tracking-widest text-white placeholder:text-gray-500 focus:outline-hidden focus:border-yellow-400 font-mono transition-colors"
+                  autoFocus
+                />
+                <Lock className="w-4 h-4 text-emerald-400 absolute right-4 top-1/2 -translate-y-1/2" />
+              </div>
+              {pinError && (
+                <p className="text-xs text-rose-400 mt-2 flex items-center gap-1">
+                  <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+                  {pinError}
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-black font-black text-sm tracking-wide shadow-lg shadow-yellow-500/30 transition-all active:scale-[0.98] cursor-pointer"
+            >
+              আনলক করুন (UNLOCK ADMIN)
+            </button>
+
+          </form>
+
+          <div className="mt-6 pt-5 border-t border-emerald-800/50 flex items-center justify-between text-xs text-gray-400">
+            <button
+              type="button"
+              onClick={onExitAdmin}
+              className="hover:text-white transition-colors flex items-center gap-1 cursor-pointer"
+            >
+              ← ক্যাসিনো লবিতে ফিরে যান
+            </button>
+            <span className="font-mono text-[11px] text-emerald-400/70">v13.4 Neext Hub</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ----------------------------------------------------
+  // AUTHENTICATED ADMIN DASHBOARD
+  // ----------------------------------------------------
+  return (
+    <div className="min-h-screen bg-[#04160e] text-white flex flex-col font-sans selection:bg-yellow-400 selection:text-black">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed top-4 right-4 z-50 bg-emerald-500 text-black font-bold px-4 py-2.5 rounded-xl shadow-2xl flex items-center gap-2 animate-bounce text-xs sm:text-sm">
+          <CheckCircle2 className="w-4 h-4 text-black shrink-0" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* TOP BAR */}
+      <header className="sticky top-0 z-40 bg-[#072418]/95 backdrop-blur-md border-b border-emerald-600/30 px-3 sm:px-6 py-2.5 sm:py-3.5">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2">
+          {/* Logo & Status */}
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white cursor-pointer"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-yellow-400 to-amber-500 flex items-center justify-center text-black font-black shadow-md shadow-yellow-500/20">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-black text-sm sm:text-base tracking-wider text-white">
+                  NEEXT HUB ADMIN
+                </span>
+                <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  LIVE SYSTEM
+                </span>
+              </div>
+              <p className="text-[10px] text-emerald-300/80 font-mono hidden md:block">
+                BengalBet Full-Spectrum Gaming Operations Control
+              </p>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              type="button"
+              onClick={loadData}
+              disabled={isLoading}
+              title="Refresh All Data"
+              className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-[#0e3c29] hover:bg-[#145239] border border-emerald-500/30 text-emerald-200 hover:text-white text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin text-yellow-400' : ''}`} />
+              <span className="hidden sm:inline">রিফ্রেশ</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onExitAdmin}
+              className="p-2 sm:px-3 sm:py-1.5 rounded-xl bg-yellow-400/10 hover:bg-yellow-400/20 border border-yellow-400/30 text-yellow-300 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">ক্যাসিনো লবি</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              title="Lock Admin"
+              className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-300 text-xs font-bold transition-colors cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* MOBILE DRAWER NAVIGATION */}
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden bg-black/70 backdrop-blur-xs flex">
+          <div className="w-72 bg-[#072418] h-full p-4 border-r border-emerald-600/30 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between pb-4 border-b border-emerald-700/40 mb-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-yellow-400 text-black flex items-center justify-center font-bold">
+                    NH
+                  </div>
+                  <span className="font-bold text-sm">Control Navigation</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="p-1 rounded-lg hover:bg-white/10 text-gray-300"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-1">
+                {adminTabs.map(tab => {
                   const Icon = tab.icon;
                   const isActive = activeTab === tab.id;
                   return (
