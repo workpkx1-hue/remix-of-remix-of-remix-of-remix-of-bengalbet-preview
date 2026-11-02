@@ -1,5 +1,13 @@
 # Remaining work
 
+Latest implementation request (2026-11-02 05:33 UTC): execute the report, improve admin settings/navigation, verify timed rewards, and simulate 30–60 days with 100 referred and 100 non-referred joins daily. Simulation must use an isolated clock/data environment, not thousands of production accounts; no unattended month-long monitoring is established by a chat turn.
+- [ ] Restore the secure server connection and verify live read access.
+- [ ] Improve admin navigation to existing settings without changing financial rules or inventing settings endpoints.
+- [ ] Implement and test safe date-based reward eligibility against actual API contracts.
+- [ ] Run deterministic 30/60-day cohort checks; report exactly what they prove and do not prove.
+- [ ] Verify changed browser flows and record remaining production release blockers.
+- [ ] Blocked: production financial/auth updates and full settlement tests require a verified protected restorable backup, isolated staging DBServer/funds, and scoped administrator identity; long-running monitoring also requires a provisioned scheduled service.
+
 - [x] Follow-up (2026-11-02 05:22 UTC): verified legacy admin login and users/settings/stats/feedbacks/transactions reads (HTTP 200); no credential in report/project files and no writes. VIP/Rewards/Referrals subtab checks remain unverified; login does not establish scoped admin or connector access.
 
 Latest request (2026-11-02 05:11 UTC): finish the previously incomplete Bengali PDF and plain-text reports, with fresh safe checks. No permission to publish or change live funds/settings.
