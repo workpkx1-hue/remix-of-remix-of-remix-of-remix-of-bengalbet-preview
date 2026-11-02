@@ -43,6 +43,7 @@ import {
 } from '../types';
 import { api } from '../services/api';
 import { AdminMemberTasks } from './AdminMemberTasks';
+import { AdminChanceRewards } from './AdminChanceRewards';
 
 interface NeextHubAdminRewardsManagerProps {
   language: 'bn' | 'en';
@@ -720,6 +721,7 @@ export const NeextHubAdminRewardsManager: React.FC<NeextHubAdminRewardsManagerPr
       {/* ========================================================================= */}
       {activeSubTab === 'signin' && (
         <div className="space-y-4">
+          <AdminChanceRewards />
           <AdminMemberTasks />
           {/* Action Bar */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#072418] p-3.5 rounded-xl border border-emerald-700/40">

@@ -35,7 +35,7 @@ export function AdminChanceRewards() {
     try {
       await api.rewards.saveChanceConfig(config);
       const back = await api.rewards.getChanceConfig();
-      if (JSON.stringify(validateChanceConfig(back.config as ChanceConfig) ? null : back.config) === 'null') throw new Error('সার্ভার থেকে পড়ে নিশ্চিত করা যায়নি।');
+      if (!back.configured || validateChanceConfig(back.config as ChanceConfig)) throw new Error('সার্ভার থেকে পড়ে নিশ্চিত করা যায়নি।');
       setConfig(back.config as ChanceConfig);
       setMessage('সার্ভার থেকে আবার পড়ে তালিকা সংরক্ষণ নিশ্চিত হয়েছে।');
     } catch (e) { setMessage(e instanceof Error ? e.message : 'সংরক্ষণ হয়নি।'); }
