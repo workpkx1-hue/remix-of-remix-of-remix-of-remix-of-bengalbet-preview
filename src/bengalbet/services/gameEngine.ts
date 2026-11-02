@@ -456,20 +456,8 @@ class GameEngineService {
     this.saveToStorage(this.config);
     this.notify();
 
-    // Persist bet round into MySQL database
-    if (betAmount > 0 || payoutAmount > 0) {
-      api.games.recordBet({
-        category: options?.category || 'slot',
-        vendor: options?.vendor || 'JILI',
-        gameName: options?.gameName || options?.gameId || 'Slot Game',
-        betAmount: Number(betAmount.toFixed(2)),
-        reward: Number(payoutAmount.toFixed(2)),
-        gameRound: options?.gameRound || `#R${Math.floor(100000 + Math.random() * 900000)}`
-      }).catch(err => {
-        // Silently capture if network is busy or user is playing offline demo
-        console.warn('Game round background DB sync:', err?.message || err);
-      });
-    }
+    // Local simulation telemetry only. Cash settlement requires a trusted server round,
+    // not the client-generated outcome or payout supplied to this method.
   }
 }
 
