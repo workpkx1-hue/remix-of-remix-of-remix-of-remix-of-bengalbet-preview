@@ -498,11 +498,6 @@ export default function App() {
   };
 
   const handleClaimCash = async (amount: number, reason: string) => {
-    setUser(prev => ({
-      ...prev,
-      balance: prev.balance + amount
-    }));
-
     try {
       let type: 'spin' | 'golden_egg' | 'red_envelope' | 'mission' | 'promo' | 'signin' = 'mission';
       const r = (reason || '').toLowerCase();
@@ -531,17 +526,11 @@ export default function App() {
     const isCash = prize.type === 'cash' || prize.type === 'bonus';
     const winAmount = isCash ? prize.amount : 0;
 
-    setUser(prev => ({
-      ...prev,
-      balance: prev.balance + winAmount,
-      freeSpins: Math.max(0, prev.freeSpins - 1)
-    }));
-
     try {
       if (winAmount > 0) {
         const res = await api.rewards.claim('spin', winAmount, `লাকি স্পিন হুইল পুরস্কার: ${prize.labelBn || prize.labelEn}`);
         if (res.success && res.newBalance !== undefined) {
-          setUser(prev => ({ ...prev, balance: res.newBalance }));
+          setUser(prev => ({ ...prev, balance: res.newBalance, freeSpins: res.user?.free_spins ?? prev.freeSpins }));
         }
       }
     } catch (e) {
