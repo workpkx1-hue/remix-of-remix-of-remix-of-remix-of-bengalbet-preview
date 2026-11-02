@@ -20,7 +20,7 @@ export function AdminChanceRewards() {
     setBusy(true); setMessage('');
     try {
       const r = await api.rewards.getChanceConfig();
-      setConfig({ spin: r.config.spin || [], golden_egg: r.config.golden_egg || [], red_envelope: r.config.red_envelope || [] });
+      setConfig({ spin: r.config['spin'] || [], golden_egg: r.config['golden_egg'] || [], red_envelope: r.config['red_envelope'] || [] });
       if (!r.configured) setMessage('এখনো কোনো পুরস্কার তালিকা অনুমোদিত হয়নি; সদস্যরা দাবি করতে পারবে না।');
     } catch (e) { setConfig(null); setMessage(e instanceof Error ? e.message : 'তালিকা লোড হয়নি।'); }
     finally { setBusy(false); }
