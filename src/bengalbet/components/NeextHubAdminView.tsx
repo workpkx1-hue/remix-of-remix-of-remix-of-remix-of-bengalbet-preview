@@ -60,7 +60,7 @@ import {
   FileCode
 } from 'lucide-react';
 import { Language } from '../types';
-import { api } from '../services/api';
+import { api, REST_API_CONFIG } from '../services/api';
 import { NeextHubTransactionsManager } from './NeextHubTransactionsManager';
 import { NeextHubGameEngineManager } from './NeextHubGameEngineManager';
 import { NeextHubAdminMessagesManager } from './NeextHubAdminMessagesManager';
@@ -86,7 +86,7 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
 }) => {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
-    return sessionStorage.getItem('neexthub_admin_session') === 'true';
+    return sessionStorage.getItem('neexthub_admin_session') === 'true' && !!sessionStorage.getItem('bengalbet_admin_key');
   });
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState('');
