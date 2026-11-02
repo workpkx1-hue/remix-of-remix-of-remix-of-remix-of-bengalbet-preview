@@ -310,15 +310,17 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
   // Load Real Backend Data for All 4 Modules
   const loadRewardBackendData = async () => {
     try {
-      const [signRes, rescueRes, promoRes, myPromoRes, ticketRes, mysteryRes] = await Promise.all([
+      const [signRes, rescueRes, promoRes, myPromoRes, ticketRes, mysteryRes, memberRes] = await Promise.all([
         api.dailySignIn.getStatus().catch(() => null),
         api.rescue.getStatus().catch(() => null),
         api.promos.getActivePromos().catch(() => null),
         api.promos.getMyRedemptions().catch(() => null),
         api.tickets.getMyTickets().catch(() => null),
         api.mysteryReward.getStatus().catch(() => null),
+        api.newMember.getStatus().catch(() => null),
       ]);
 
+      setMemberTasks(memberRes?.success ? memberRes.tasks : []);
       if (signRes && signRes.success) {
         const signData = (signRes as any).status || signRes;
         setSigninStreak(signData.currentStreak || signData.streak || 0);
@@ -529,29 +531,21 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
   };
 
   // 12-Day New Member Action
-  const [signed12Days, setSigned12Days] = useState<number[]>([1]);
-
-  const handleSignIn12Day = async (day: number, bonus: number, task: string) => {
-    if (signed12Days.includes(day)) return;
-    setSigned12Days(prev => [...prev, day]);
-    setSigninStreak(prev => prev + 1);
-    setSigninTotalBonus(prev => prev + bonus);
-
-    if (onClaimSuccess) {
-      onClaimSuccess(bonus, `দিন ${day} সদস্য বৃদ্ধির বোনাস: ${task} (+৳${bonus})`);
-    }
+  const [memberTasks, setMemberTasks] = useState<any[]>([]);
+  const [memberBusy, setMemberBusy] = useState(false);
+  const [memberError, setMemberError] = useState<string | null>(null);
+  const handleSignIn12Day = async (day: number, _bonus: number, _task: string) => {
+    if (memberBusy || !memberTasks.find(t => t.day === day)?.eligible) return;
+    setMemberBusy(true); setMemberError(null);
     try {
-      await api.rewards.claim('signin', bonus, `দিন ${day} সদস্য বৃদ্ধির বোনাস: ${task} (+৳${bonus})`);
-      loadRewardBackendData();
-    } catch (e) {
-      console.warn('Could not sync 12-day signin with backend:', e);
-    }
-
-    confetti({
-      particleCount: 65,
-      spread: 70,
-      origin: { y: 0.5 }
-    });
+      const result = await api.newMember.claim(day);
+      await refreshSettledReward(result, onSettledReward);
+      await loadRewardBackendData();
+      confetti({ particleCount: 65, spread: 70, origin: { y: 0.5 } });
+    } catch (error: any) {
+      setMemberError(error.message || 'কাজের পুরস্কার গ্রহণ করা যায়নি।');
+      await loadRewardBackendData();
+    } finally { setMemberBusy(false); }
   };
 
   // 30-Day Daily Sign-in action
@@ -1340,9 +1334,11 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
         {signinTab === 'new_member' ? (
           /* 12-Day Milestone Tasks */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 flex-1">
+            {memberError && <p role="alert" className="text-destructive col-span-full">{memberError}</p>}
             {signin12DaysData.map((item) => {
-              const isClaimed = signed12Days.includes(item.day);
-              const isUnlocked = item.day <= signed12Days.length + 1;
+              const state = memberTasks.find(t => t.day === item.day);
+              const isClaimed = state?.claimed === true;
+              const isUnlocked = state?.eligible === true;
 
               return (
                 <div
@@ -1374,7 +1370,8 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
                   </div>
 
                   <button
-                    disabled={isClaimed || !isUnlocked}
+                    aria-label={`নতুন সদস্য দিন ${item.day} পুরস্কার দাবি`}
+                    disabled={isClaimed || !isUnlocked || memberBusy}
                     onClick={() => handleSignIn12Day(item.day, item.bonus, item.task)}
                     className={`w-full py-1.5 rounded-xl text-xs font-bold font-bengali transition-all cursor-pointer ${
                       isClaimed
@@ -1759,9 +1756,11 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
       <div className="px-3 sm:px-4 py-3 bg-[#fdfbf7]">
         {signinTab === 'new_member' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {memberError && <p role="alert" className="text-destructive col-span-full">{memberError}</p>}
             {signin12DaysData.map((item) => {
-              const isClaimed = signed12Days.includes(item.day);
-              const isUnlocked = item.day <= signed12Days.length + 1;
+              const state = memberTasks.find(t => t.day === item.day);
+              const isClaimed = state?.claimed === true;
+              const isUnlocked = state?.eligible === true;
 
               return (
                 <div
@@ -1792,7 +1791,8 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
                   </div>
 
                   <button
-                    disabled={isClaimed || !isUnlocked}
+                    aria-label={`নতুন সদস্য দিন ${item.day} পুরস্কার দাবি`}
+                    disabled={isClaimed || !isUnlocked || memberBusy}
                     onClick={() => handleSignIn12Day(item.day, item.bonus, item.task)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold font-bengali transition-all shrink-0 cursor-pointer ${
                       isClaimed
