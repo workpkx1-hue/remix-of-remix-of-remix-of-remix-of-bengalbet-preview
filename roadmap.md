@@ -1,5 +1,10 @@
 # Remaining work
 
+Current approved sequence (2026-11-02): verify the five missing bonus administrator sections first, then isolated member reward/wallet checks. Read-only live checks and additive read handlers may proceed; financial mutations remain blocked until protected backup, isolated funds and scoped administrator access are available. Do not treat this sequence approval as permission to change real-member balances.
+- [ ] Reproduce all five administrator failures against the newly linked connection.
+- [ ] Restore safe administrator reads where current schema/contracts permit, with focused regression checks.
+- [ ] Verify member reward views in the live browser and document claim/settings blockers accurately.
+
 Current request: audit every member bonus, achievement, wallet gift/event and matching administrator controls; explain the actual promotion workflow; exercise authorized test-member flows in the browser and report discrepancies. Create at most one clearly marked test member, no existing-member impersonation or money/config mutations without safe isolation.
 - [ ] Produce a promotion/eligibility/control matrix from the code and verified live reads.
 - [ ] Exercise registration/login and read-only rewards/wallet flow with an explicitly marked new test member.
