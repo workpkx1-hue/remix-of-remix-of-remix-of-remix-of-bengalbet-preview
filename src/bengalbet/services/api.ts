@@ -1178,6 +1178,10 @@ export const api = {
       return request<{ success: boolean; count: number; tiers: any[] }>('/api/vip/tiers');
     },
 
+    async getAdminTiers() {
+      return request<{ success: boolean; count: number; tiers: any[] }>('/api/admin/vip/tiers');
+    },
+
     async saveTier(tier: any) {
       return request<{ success: boolean; message: string; tier: any }>('/api/vip/tiers', {
         method: 'POST',
