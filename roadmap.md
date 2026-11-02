@@ -2,6 +2,8 @@
 
 Current scope: implement the Bengali A-to-Z report on the user-designated test DBServer. Only isolated test accounts may undergo financial tests; unrelated members remain untouched. No background month-long monitoring is running.
 
+Latest request (2026-11-02 06:07 UTC): continue all remaining implementation, live test-server uploads and isolated browser checks.
+
 ## Verified this iteration
 - [x] Connected BengalBet Server and inspected schema/source.
 - [x] Stored protected rollback copies of seven PHP files and five settings/tier table snapshots; /data/ returns 403. This is not a full-database backup or restore drill.
