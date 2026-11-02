@@ -1,6 +1,12 @@
 # Remaining work
 
-Latest request (2026-11-02 04:52 UTC): finish remaining safe checks and deliver a detailed Bengali A-to-Z current-status, site-flow, image and implementation plan as PDF and plain text. No permission to publish or change live funds/settings.
+Latest request (2026-11-02 05:11 UTC): finish the previously incomplete Bengali PDF and plain-text reports, with fresh safe checks. No permission to publish or change live funds/settings.
+- [x] Rerun all 11 focused tests; verify public settings responds HTTP 200/success; open 11 guest paths on desktop/mobile, then recheck visible images after settling and dismissing notices on home/promotions/aviator/admin.
+- [x] Consolidate current member/program/admin source inventories and inspect 23 marketing artworks; separate prior authenticated observations from fresh guest checks.
+- [ ] Generate matching detailed PDF/plain text and inspect every rendered PDF page.
+- Blocked: no accessible BengalBet Server connection in this workspace, no restored audit-member session, protected backup/staging/scoped admin not verified; authenticated admin writes and financial flows remain unverified.
+
+Earlier request (2026-11-02 04:52 UTC): finish remaining safe checks and deliver a detailed Bengali A-to-Z current-status, site-flow, image and implementation plan as PDF and plain text. No permission to publish or change live funds/settings.
 - [ ] Finish fresh desktop/mobile read-only navigation and loaded-image checks; state any untested paths explicitly.
 - [ ] Consolidate all member/admin/program/asset findings with evidence levels and release gates.
 - [ ] Deliver matching PDF and plain-text reports; visually inspect every PDF page.
