@@ -10,13 +10,14 @@ if ($section === 'daily-signin' && $action === 'config' && $method === 'POST') {
 }
 require_once __DIR__.'/new_member_rules.php';
 if($section==='daily-signin' && $action==='new-member-config') {
-    if($method==='GET')Database::jsonResponse(['success'=>true,'config'=>bbMemberConfig()]);
-    if($method!=='POST')Database::errorResponse('Method Not Allowed',405);
-    try {$config=bbValidateMemberConfig($input);}catch(InvalidArgumentException $e){Database::errorResponse($e->getMessage(),422);}
-    Database::execute('INSERT INTO new_member_config (id,config_json) VALUES (1,?) ON DUPLICATE KEY UPDATE config_json=VALUES(config_json)',[json_encode($config,JSON_UNESCAPED_UNICODE)]);
-    Database::jsonResponse(['success'=>true,'config'=>$config]);
+ if($method==='GET')Database::jsonResponse(['success'=>true,'config'=>bbMemberConfig()]);
+ if($method!=='POST')Database::errorResponse('Method Not Allowed',405);
+ try {$config=bbValidateMemberConfig($input);}catch(InvalidArgumentException $e){Database::errorResponse($e->getMessage(),422);}
+ Database::execute('INSERT INTO new_member_config (id,config_json) VALUES (1,?) ON DUPLICATE KEY UPDATE config_json=VALUES(config_json)',[json_encode($config,JSON_UNESCAPED_UNICODE)]);
+ Database::jsonResponse(['success'=>true,'config'=>$config]);
 }
-// The live entry point additionally requires admin_reward_controls.php; this mirror does not include that separate file.
+require __DIR__.'/chance_rewards_admin.php';
+require __DIR__.'/admin_reward_controls.php';
 if ($method !== 'GET') Database::errorResponse('This reward operation is not implemented; no changes were made.',405);
 function bbRewardRow(array $row): array {
     $out = [];
