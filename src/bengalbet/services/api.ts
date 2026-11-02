@@ -5,6 +5,7 @@
  */
 
 import { UserAccount } from '../types';
+import { normalizeServerConfig } from './apiConfig';
 
 const STORAGE_KEY_CONFIG = 'bengalbet_rest_api_config';
 
@@ -14,15 +15,13 @@ const getInitialConfig = () => {
     if (saved) {
       const parsed = JSON.parse(saved);
       return {
-        rootDomain: ((parsed.rootDomain && !String(parsed.rootDomain).includes('neexthub')) ? parsed.rootDomain : 'https://server.nexarofx.com').replace(/\/+$/, ''),
-        path: parsed.path !== undefined ? parsed.path : '/dbserver',
+        ...normalizeServerConfig(parsed.rootDomain, parsed.path),
         masterKey: ''
       };
     }
   } catch {}
   return {
-    rootDomain: 'https://server.nexarofx.com',
-    path: '/dbserver',
+    ...normalizeServerConfig(),
     masterKey: ''
   };
 };
@@ -50,14 +49,14 @@ export const REST_API_CONFIG = {
     return _configState.rootDomain;
   },
   set rootDomain(val: string) {
-    _configState.rootDomain = val.trim().replace(/\/+$/, '');
+    Object.assign(_configState, normalizeServerConfig(val, _configState.path));
     persistConfig();
   },
   get path() {
     return _configState.path;
   },
   set path(val: string) {
-    _configState.path = val.trim();
+    Object.assign(_configState, normalizeServerConfig(_configState.rootDomain, val));
     persistConfig();
   },
   // Admin master key lives only in this browser tab's session, never in the code
@@ -79,20 +78,17 @@ export const REST_API_CONFIG = {
     return `${this.rootDomain}${p}/masterapi.php`;
   },
   update(newConf: { rootDomain?: string; path?: string; masterKey?: string }) {
-    if (newConf.rootDomain !== undefined) {
-      _configState.rootDomain = newConf.rootDomain.trim().replace(/\/+$/, '');
-    }
-    if (newConf.path !== undefined) {
-      _configState.path = newConf.path.trim();
-    }
+    Object.assign(_configState, normalizeServerConfig(
+      newConf.rootDomain ?? _configState.rootDomain,
+      newConf.path ?? _configState.path,
+    ));
     if (newConf.masterKey !== undefined) {
       this.masterKey = newConf.masterKey;
     }
     persistConfig();
   },
   resetToDefaults() {
-    _configState.rootDomain = 'https://server.nexarofx.com';
-    _configState.path = '/dbserver';
+    Object.assign(_configState, normalizeServerConfig());
     persistConfig();
   }
 };
