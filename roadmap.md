@@ -1,5 +1,7 @@
 # Remaining work
 
+- [ ] Follow-up (2026-11-02 05:22 UTC): use the user-supplied admin credential once for read-only login and section checks; never store it in report/project files or modify balances/settings.
+
 Latest request (2026-11-02 05:11 UTC): finish the previously incomplete Bengali PDF and plain-text reports, with fresh safe checks. No permission to publish or change live funds/settings.
 - [x] Rerun all 11 focused tests; verify public settings responds HTTP 200/success; open 11 guest paths on desktop/mobile, then recheck visible images after settling and dismissing notices on home/promotions/aviator/admin.
 - [x] Consolidate current member/program/admin source inventories and inspect 23 marketing artworks; separate prior authenticated observations from fresh guest checks.
