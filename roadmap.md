@@ -1,5 +1,10 @@
 # Remaining work
 
+Latest request (2026-11-02 04:28 UTC): deliver a detailed Bangla full-site member-flow, image/banner, bonus-timing and publishing-readiness plan grounded in source, desktop/mobile browser observations and live data. This request is audit/planning only, not permission to deploy, claim bonuses or change balances/settings.
+- [ ] Inventory member pages, promotion promises, game programs and image sources with evidence.
+- [ ] Capture desktop and mobile guest/member flows and audit loaded images, errors and navigation.
+- [ ] Produce the detailed marketing/program alignment and prioritized publishing-readiness plan, clearly separating verified, code-only and untested findings.
+
 Current approved sequence (2026-11-02): verify the five missing bonus administrator sections first, then isolated member reward/wallet checks. Read-only live checks and additive read handlers may proceed; financial mutations remain blocked until protected backup, isolated funds and scoped administrator access are available. Do not treat this sequence approval as permission to change real-member balances.
 Follow-up request: verify user-provided admin login and audit-member wallet. Completed actual legacy admin login (HTTP 200/session accepted) and member login, two matching balance reads of 500, wallet-card read, and successful welcome-ledger match; no money/config mutations. This does not clear the missing-handler, staging or scoped-admin blockers.
 - [x] Reproduce all five administrator failures against the newly linked connection (all five return 404 on 2026-11-02).
