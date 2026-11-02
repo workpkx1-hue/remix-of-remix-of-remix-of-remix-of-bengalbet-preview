@@ -8,6 +8,7 @@ import {
 import confetti from 'canvas-confetti';
 import { UserAccount, UserMysteryRewardStatus } from '../types';
 import { api } from '../services/api';
+import { mayClaimMysteryReward } from '../services/rewardEligibility';
 
 interface MysteryRewardModalProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ export const MysteryRewardModal: React.FC<MysteryRewardModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<UserMysteryRewardStatus | null>(null);
-  const [promoCodeInput, setPromoCodeInput] = useState('BENGALBETVIP');
+  const [promoCodeInput, setPromoCodeInput] = useState('');
   const [copiedCode, setCopiedCode] = useState(false);
   const [revealing, setRevealing] = useState(false);
   const [revealedBonus, setRevealedBonus] = useState<number | null>(null);
@@ -36,14 +37,20 @@ export const MysteryRewardModal: React.FC<MysteryRewardModalProps> = ({
   const fetchStatus = async () => {
     try {
       setLoading(true);
+      setStatus(null);
       const res = await api.mysteryReward.getStatus();
       if (res.success) {
         setStatus(res as any);
+        setPromoCodeInput(res.config?.promoCode ?? '');
         if (res.hasClaimed && res.claimedCard) {
           setRevealedBonus(res.claimedCard.bonusAmount);
         }
+      } else {
+        throw new Error('পুরস্কারের তথ্য পাওয়া যায়নি।');
       }
     } catch (err: any) {
+      setStatus(null);
+      setClaimError('পুরস্কারের যোগ্যতা যাচাই হয়নি। আবার খুলে চেষ্টা করুন।');
       console.error('Failed to load mystery reward status:', err);
     } finally {
       setLoading(false);
@@ -52,18 +59,21 @@ export const MysteryRewardModal: React.FC<MysteryRewardModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
+      setRevealedBonus(null);
       fetchStatus();
       setClaimError(null);
     }
   }, [isOpen]);
 
   const handleCopyPromo = () => {
-    navigator.clipboard.writeText('BENGALBETVIP');
+    if (!status?.config?.promoCode) return;
+    navigator.clipboard.writeText(status.config.promoCode);
     setCopiedCode(true);
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
   const handleClaimReward = async () => {
+    if (!mayClaimMysteryReward(status, revealing || loading) || revealedBonus !== null) return;
     try {
       setRevealing(true);
       setClaimError(null);
@@ -99,12 +109,13 @@ export const MysteryRewardModal: React.FC<MysteryRewardModalProps> = ({
   if (!isOpen) return null;
 
   const config = status?.config;
-  const isEligible = status?.isEligible ?? true;
-  const isUnlocked = status?.isUnlocked ?? true;
+  const isEligible = status?.isEligible === true;
+  const isUnlocked = status?.isUnlocked === true;
   const hasClaimed = status?.hasClaimed || Boolean(revealedBonus);
-  const userBet = status?.userBetTotal ?? 1850;
-  const minBet = config?.minBetRequired ?? 500;
-  const betProgressPercent = Math.min(100, Math.round((userBet / minBet) * 100));
+  const userBet = status?.userBetTotal ?? 0;
+  const minBet = config?.minBetRequired ?? status?.minBetRequired ?? 0;
+  const betProgressPercent = minBet > 0 ? Math.min(100, Math.round((userBet / minBet) * 100)) : 0;
+  const claimDisabled = !mayClaimMysteryReward(status, revealing || loading) || hasClaimed;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
@@ -233,7 +244,7 @@ export const MysteryRewardModal: React.FC<MysteryRewardModalProps> = ({
                       className="px-2 py-0.5 rounded bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-400/40 font-mono font-bold flex items-center gap-1 transition-colors cursor-pointer"
                       title="কোড কপি করুন"
                     >
-                      <span>BENGALBETVIP</span>
+                      <span>{config?.promoCode || '—'}</span>
                       {copiedCode ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
                     </button>
                   </div>
@@ -288,11 +299,11 @@ export const MysteryRewardModal: React.FC<MysteryRewardModalProps> = ({
                 <div className="grid grid-cols-2 gap-2 pt-1 text-[11px]">
                   <div className="flex items-center gap-1.5 p-2 rounded-xl bg-purple-900/30 border border-purple-800/30">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span className="text-gray-300 font-bengali">মোবাইল ভেরিফাইড</span>
+                    <span className="text-gray-300 font-bengali">{status?.isPhoneVerified ? 'মোবাইল ভেরিফাইড' : 'মোবাইল যাচাই বাকি'}</span>
                   </div>
                   <div className="flex items-center gap-1.5 p-2 rounded-xl bg-purple-900/30 border border-purple-800/30">
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                    <span className="text-gray-300 font-bengali">ইমেল ভেরিফাইড</span>
+                    <span className="text-gray-300 font-bengali">{status?.isEmailVerified ? 'ইমেল ভেরিফাইড' : 'ইমেল যাচাই বাকি'}</span>
                   </div>
                 </div>
               </div>
@@ -315,9 +326,9 @@ export const MysteryRewardModal: React.FC<MysteryRewardModalProps> = ({
                 ) : (
                   <button
                     onClick={handleClaimReward}
-                    disabled={revealing || loading}
+                    disabled={claimDisabled}
                     className={`w-full py-3.5 rounded-2xl font-black text-sm font-bengali shadow-lg flex items-center justify-center gap-2 transition-all active:scale-[0.98] cursor-pointer ${
-                      revealing || loading
+                      claimDisabled
                         ? 'bg-amber-600/50 text-amber-200 cursor-not-allowed'
                         : 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-purple-950 hover:brightness-110 shadow-amber-500/30 animate-pulse'
                     }`}
@@ -381,7 +392,7 @@ export const MysteryRewardModal: React.FC<MysteryRewardModalProps> = ({
               <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-between">
                 <div>
                   <div className="text-[11px] text-amber-200 font-bold">বিশেষ ভিআইপি প্রোমোকোড:</div>
-                  <div className="text-sm font-mono font-black text-amber-300 tracking-wider">BENGALBETVIP</div>
+                  <div className="text-sm font-mono font-black text-amber-300 tracking-wider">{config?.promoCode || '—'}</div>
                 </div>
                 <button
                   onClick={handleCopyPromo}
