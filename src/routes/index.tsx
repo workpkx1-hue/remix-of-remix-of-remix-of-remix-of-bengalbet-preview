@@ -1,24 +1,47 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, ClientOnly } from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
+import "../bengalbet/index.css";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+const BengalBetApp = lazy(async () => {
+  const [{ default: App }, { FavoritesProvider }] = await Promise.all([
+    import("../bengalbet/App"),
+    import("../bengalbet/hooks/useFavorites"),
+  ]);
+  return {
+    default: () => (
+      <FavoritesProvider>
+        <App />
+      </FavoritesProvider>
+    ),
+  };
+});
+
 export const Route = createFileRoute("/")({
+  head: () => ({
+    meta: [
+      { title: "BengalBet - Online Gaming Portal" },
+      { name: "description", content: "BengalBet games lobby, promotions, lucky spin and VIP rewards." },
+      { property: "og:title", content: "BengalBet - Online Gaming Portal" },
+      { property: "og:description", content: "BengalBet games lobby, promotions, lucky spin and VIP rewards." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&family=Teko:wght@500;600;700&display=swap",
+      },
+    ],
+  }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <ClientOnly fallback={<div className="min-h-screen" />}>
+      <Suspense fallback={<div className="min-h-screen" />}>
+        <BengalBetApp />
+      </Suspense>
+    </ClientOnly>
   );
 }
