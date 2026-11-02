@@ -522,19 +522,10 @@ export default function App() {
     }
   };
 
-  const handleSpinWin = async (prize: SpinPrize) => {
-    const isCash = prize.type === 'cash' || prize.type === 'bonus';
-    const winAmount = isCash ? prize.amount : 0;
-
-    try {
-      if (winAmount > 0) {
-        const res = await api.rewards.claim('spin', winAmount, `লাকি স্পিন হুইল পুরস্কার: ${prize.labelBn || prize.labelEn}`);
-        if (res.success && res.newBalance !== undefined) {
-          setUser(prev => ({ ...prev, balance: res.newBalance, freeSpins: res.user?.free_spins ?? prev.freeSpins }));
-        }
-      }
-    } catch (e) {
-      console.warn('Spin claim db sync note:', e);
+  // The server already settled the spin; only reflect its returned wallet state.
+  const handleSpinWin = (_prize: SpinPrize, result?: any) => {
+    if (result?.success && result.newBalance !== undefined) {
+      setUser(prev => ({ ...prev, balance: result.newBalance, freeSpins: result.user?.free_spins ?? prev.freeSpins }));
     }
   };
 

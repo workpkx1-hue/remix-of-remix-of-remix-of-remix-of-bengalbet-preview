@@ -14,28 +14,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Sparkles, Trophy, RotateCcw, CheckCircle, Volume2, VolumeX, Zap } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Language, UserAccount, SpinPrize } from '../types';
+import { api } from '../services/api';
 
 interface LuckySpinModalProps {
   language: Language;
   user: UserAccount;
   onClose: () => void;
-  onSpinWin: (prize: SpinPrize) => void;
+  onSpinWin: (prize: SpinPrize, result?: any) => void;
   onBackToReward?: (tab?: string) => void;
 }
 
-// 10 Distinct Rewards, exactly 10 equal 36-degree sectors
-const WHEEL_PRIZES: SpinPrize[] = [
-  { id: 1, labelBn: '৳ ৮,৮৮৮', labelEn: '৳ 8,888', amount: 8888, type: 'cash', color: '#b91c1c', textColor: '#fef08a', probability: 0.02 },
-  { id: 2, labelBn: '৳ ২,০০০', labelEn: '৳ 2,000', amount: 2000, type: 'cash', color: '#047857', textColor: '#ffffff', probability: 0.06 },
-  { id: 3, labelBn: 'iPhone 17', labelEn: 'iPhone 17', amount: 150000, type: 'iphone', color: '#6d28d9', textColor: '#ffffff', probability: 0.03 },
-  { id: 4, labelBn: '৳ ১,০০০', labelEn: '৳ 1,000', amount: 1000, type: 'cash', color: '#1d4ed8', textColor: '#ffffff', probability: 0.09 },
-  { id: 5, labelBn: '১০ স্পিন', labelEn: '10 Spins', amount: 10, type: 'spins', color: '#0891b2', textColor: '#ffffff', probability: 0.15 },
-  { id: 6, labelBn: '৳ ৫০০', labelEn: '৳ 500', amount: 500, type: 'cash', color: '#d97706', textColor: '#ffffff', probability: 0.18 },
-  { id: 7, labelBn: 'গোল্ডেন বক্স', labelEn: 'Golden Box', amount: 350, type: 'bonus', color: '#4338ca', textColor: '#ffffff', probability: 0.12 },
-  { id: 8, labelBn: '৳ ২৫০', labelEn: '৳ 250', amount: 250, type: 'cash', color: '#be123c', textColor: '#ffffff', probability: 0.15 },
-  { id: 9, labelBn: '৫ স্পিন', labelEn: '5 Spins', amount: 5, type: 'spins', color: '#0f766e', textColor: '#ffffff', probability: 0.10 },
-  { id: 10, labelBn: '৳ ১০০', labelEn: '৳ 100', amount: 100, type: 'cash', color: '#ea580c', textColor: '#ffffff', probability: 0.10 },
-];
+// Sector colours only; prizes and odds come from the administrator's server table.
+const PALETTE = ['#b91c1c','#047857','#6d28d9','#1d4ed8','#0891b2','#d97706','#4338ca','#be123c','#0f766e','#ea580c'];
+const toPrize = (p: { label: string; amount: number }, i: number): SpinPrize => ({ id: i + 1, labelBn: p.label, labelEn: p.label, amount: p.amount, type: 'cash', color: PALETTE[i % PALETTE.length], textColor: '#ffffff', probability: 0 });
 
 const SECTOR_SUBTITLES = [
   { bn: 'মেগা জ্যাকপট', en: 'Mega Jackpot' },
@@ -67,7 +58,16 @@ export const LuckySpinModal: React.FC<LuckySpinModalProps> = ({
   const [spinning, setSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [wonPrize, setWonPrize] = useState<SpinPrize | null>(null);
-  const [spinsLeft, setSpinsLeft] = useState(user.freeSpins || 3);
+  const [spinsLeft, setSpinsLeft] = useState(user.freeSpins || 0);
+  const [WHEEL_PRIZES, setWheelPrizes] = useState<SpinPrize[]>([]);
+  const [tableState, setTableState] = useState<'loading' | 'ready' | 'empty'>('loading');
+  const [spinError, setSpinError] = useState('');
+  useEffect(() => {
+    api.rewards.chanceTable('spin')
+      .then((r) => { const list = (r.prizes || []).map(toPrize); setWheelPrizes(list); setTableState(list.length ? 'ready' : 'empty'); })
+      .catch(() => setTableState('empty'));
+  }, []);
+  const deg = 360 / Math.max(1, WHEEL_PRIZES.length);
   const [isMuted, setIsMuted] = useState(false);
   const [tickerIndex, setTickerIndex] = useState(0);
 
@@ -144,15 +144,22 @@ export const LuckySpinModal: React.FC<LuckySpinModalProps> = ({
   };
 
   // Trigger Spin with Mathematically Exact 10-Sector Pointer Alignment
-  const handleSpin = () => {
-    if (spinning || spinsLeft <= 0) return;
+  const handleSpin = async () => {
+    if (spinning || spinsLeft <= 0 || tableState !== 'ready') return;
     setSpinning(true);
     setWonPrize(null);
+    setSpinError('');
+    let result: any;
+    try {
+      result = await api.rewards.playChance('spin');
+    } catch (e: any) {
+      setSpinning(false);
+      setSpinError(e?.message || 'স্পিন এখন সম্ভব হয়নি।');
+      return;
+    }
     playSound('whoosh');
-
-    // Pick target prize index (0 to 9)
-    const targetIndex = Math.floor(Math.random() * WHEEL_PRIZES.length);
-    const selectedPrize = WHEEL_PRIZES[targetIndex];
+    const targetIndex = Math.min(Math.max(0, Number(result.prize?.index) || 0), WHEEL_PRIZES.length - 1);
+    const selectedPrize = { ...WHEEL_PRIZES[targetIndex], labelBn: result.prize.label, labelEn: result.prize.label, amount: result.prize.amount };
 
     // Mathematical precision for 10 equal sectors (36 degrees each):
     // Sector 0 is centered at 0° (12 o'clock, right under the pointer).
@@ -160,7 +167,7 @@ export const LuckySpinModal: React.FC<LuckySpinModalProps> = ({
     // When the wheel rotates clockwise by delta, Sector i moves to (i * 36 + delta) % 360.
     // For Sector i to align perfectly with the top pointer at 0°:
     // (i * 36 + delta) % 360 = 0  ==>  delta % 360 = (360 - (i * 36 % 360)) % 360.
-    const targetMod = (360 - ((targetIndex * 36) % 360)) % 360;
+    const targetMod = (360 - ((targetIndex * deg) % 360)) % 360;
     const currentMod = ((rotation % 360) + 360) % 360;
     let step = (targetMod - currentMod) % 360;
     if (step < 0) step += 360;
@@ -185,13 +192,8 @@ export const LuckySpinModal: React.FC<LuckySpinModalProps> = ({
     setTimeout(() => {
       setSpinning(false);
       setWonPrize(selectedPrize);
-      setSpinsLeft(prev => {
-        if (selectedPrize.type === 'spins') {
-          return prev - 1 + selectedPrize.amount;
-        }
-        return Math.max(0, prev - 1);
-      });
-      onSpinWin(selectedPrize);
+      setSpinsLeft(Number(result.user?.free_spins ?? 0));
+      onSpinWin(selectedPrize, result);
       playSound('win');
 
       confetti({
@@ -208,8 +210,8 @@ export const LuckySpinModal: React.FC<LuckySpinModalProps> = ({
   // Sector i: -18° + (i * 36)° to +18° + (i * 36)°
   const R = 196;
   const sectorPaths = WHEEL_PRIZES.map((_, i) => {
-    const a1 = ((i * 36 - 18) * Math.PI) / 180;
-    const a2 = ((i * 36 + 18) * Math.PI) / 180;
+    const a1 = ((i * deg - deg / 2) * Math.PI) / 180;
+    const a2 = ((i * deg + deg / 2) * Math.PI) / 180;
     const x1 = 200 + R * Math.sin(a1);
     const y1 = 200 - R * Math.cos(a1);
     const x2 = 200 + R * Math.sin(a2);
@@ -358,7 +360,7 @@ export const LuckySpinModal: React.FC<LuckySpinModalProps> = ({
               {WHEEL_PRIZES.map((prize, idx) => {
                 const isGrand = prize.id === 1;
                 return (
-                  <g key={`text-${prize.id}`} transform={`rotate(${idx * 36} 200 200)`}>
+                  <g key={`text-${prize.id}`} transform={`rotate(${idx * deg} 200 200)`}>
                     {/* Crown for Mega Jackpot */}
                     {isGrand && (
                       <text
@@ -397,7 +399,7 @@ export const LuckySpinModal: React.FC<LuckySpinModalProps> = ({
                       fontFamily="sans-serif"
                       filter="url(#textDropShadow)"
                     >
-                      {language === 'bn' ? SECTOR_SUBTITLES[idx].bn : SECTOR_SUBTITLES[idx].en}
+                      {language === 'bn' ? SECTOR_SUBTITLES[idx % SECTOR_SUBTITLES.length].bn : SECTOR_SUBTITLES[idx % SECTOR_SUBTITLES.length].en}
                     </text>
                   </g>
                 );
@@ -412,7 +414,7 @@ export const LuckySpinModal: React.FC<LuckySpinModalProps> = ({
           <button
             id="spin-trigger-btn"
             onClick={handleSpin}
-            disabled={spinning || spinsLeft <= 0}
+            disabled={spinning || spinsLeft <= 0 || tableState !== 'ready'}
             className={`
               absolute z-30 w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 border-yellow-300 shadow-[0_0_25px_rgba(0,0,0,0.8)]
               flex flex-col items-center justify-center font-game font-black text-sm sm:text-base tracking-wider uppercase
@@ -432,6 +434,10 @@ export const LuckySpinModal: React.FC<LuckySpinModalProps> = ({
           </button>
         </div>
 
+        {tableState === 'empty' && (
+          <p className="mt-2 text-center text-xs font-bengali text-yellow-200">স্পিনের পুরস্কার তালিকা এখনো চালু হয়নি। শীঘ্রই আসছে।</p>
+        )}
+        {spinError && <p className="mt-2 text-center text-xs font-bengali text-red-300">{spinError}</p>}
         {/* Won Prize Celebration Card */}
         {wonPrize && (
           <div className="mt-2 p-3 bg-gradient-to-r from-yellow-500/20 via-emerald-500/30 to-yellow-500/20 border-2 border-yellow-400 rounded-2xl text-center animate-in zoom-in-95 w-full z-10">
@@ -454,7 +460,7 @@ export const LuckySpinModal: React.FC<LuckySpinModalProps> = ({
           {spinsLeft > 0 ? (
             <button
               onClick={handleSpin}
-              disabled={spinning}
+              disabled={spinning || tableState !== 'ready'}
               className="w-full py-3 rounded-2xl bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 hover:from-yellow-300 hover:to-amber-300 text-black font-black text-sm sm:text-base font-bengali shadow-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
             >
               <RotateCcw className={`w-4 h-4 ${spinning ? 'animate-spin' : ''}`} />
