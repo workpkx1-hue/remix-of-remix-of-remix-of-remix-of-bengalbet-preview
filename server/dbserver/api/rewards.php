@@ -8,13 +8,17 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../db.php';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') Database::errorResponse('Method Not Allowed', 405);
 $userId = Database::requireUser();
 $input = Database::getJsonInput();
 $type = trim((string)($input['type'] ?? ''));
 $counters = ['spin' => 'free_spins', 'golden_egg' => 'golden_eggs_available', 'red_envelope' => 'red_packets_available'];
-if (!isset($counters[$type])) Database::errorResponse('Dedicated reward eligibility required; generic cash claim disabled.', 403);
 
+if (($_GET['action'] ?? '') === 'table' && $_SERVER['REQUEST_METHOD'] === 'GET') {
+    $t = bbChanceTable(in_array($_GET['type'] ?? '', ['spin','golden_egg','red_envelope'], true) ? $_GET['type'] : 'spin');
+    Database::jsonResponse(['success' => true, 'prizes' => array_map(fn($r) => ['label' => $r['label'] ?? ('৳' . $r['amount']), 'amount' => (float)$r['amount']], $t)]);
+}
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') Database::errorResponse('Method Not Allowed', 405);
+if (!isset($counters[$type])) Database::errorResponse('Dedicated reward eligibility required; generic cash claim disabled.', 403);
 function bbChanceTable(string $type): array {
     $file = __DIR__ . '/../data/chance_rewards.json';
     $cfg = is_file($file) ? json_decode((string)file_get_contents($file), true) : null;
@@ -33,8 +37,9 @@ $table = bbChanceTable($type);
 if (!$table) Database::errorResponse('Prize table not approved by an administrator yet.', 409);
 
 $total = array_sum(array_map(fn($r) => (float)$r['weight'], $table));
-$pick = random_int(1, 1000000) / 1000000 * $total; $prize = $table[count($table) - 1];
-foreach ($table as $r) { $pick -= (float)$r['weight']; if ($pick <= 0) { $prize = $r; break; } }
+$pick = random_int(1, 1000000) / 1000000 * $total; $index = count($table) - 1;
+foreach ($table as $i => $r) { $pick -= (float)$r['weight']; if ($pick <= 0) { $index = $i; break; } }
+$prize = $table[$index];
 $amount = round((float)$prize['amount'], 2);
 $label = substr((string)($prize['label'] ?? ('৳' . $amount)), 0, 60);
 $col = $counters[$type];
@@ -59,4 +64,4 @@ try {
 }
 $u = Database::fetchOne('SELECT * FROM users WHERE id=?', [$userId]);
 unset($u['password_hash'], $u['transaction_password']);
-Database::jsonResponse(['success' => true, 'prize' => ['label' => $label, 'amount' => $amount], 'newBalance' => (float)$u['balance'], 'user' => $u]);
+Database::jsonResponse(['success' => true, 'prize' => ['index' => $index, 'label' => $label, 'amount' => $amount], 'newBalance' => (float)$u['balance'], 'user' => $u]);
