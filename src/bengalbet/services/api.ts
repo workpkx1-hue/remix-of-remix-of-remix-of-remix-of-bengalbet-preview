@@ -1183,14 +1183,14 @@ export const api = {
     },
 
     async saveTier(tier: any) {
-      return request<{ success: boolean; message: string; tier: any }>('/api/vip/tiers', {
+      return request<{ success: boolean; message: string; tier: any }>('/api/admin/vip/tiers', {
         method: 'POST',
         body: JSON.stringify(tier)
       });
     },
 
     async deleteTier(level: number) {
-      return request<{ success: boolean; message: string }>(`/api/vip/tiers/${level}`, {
+      return request<{ success: boolean; message: string }>(`/api/admin/vip/tiers/${level}`, {
         method: 'DELETE'
       });
     },
