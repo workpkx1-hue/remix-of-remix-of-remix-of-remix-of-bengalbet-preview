@@ -960,6 +960,10 @@ export default function App() {
           initialSigninSubTab={signinSubTab}
           onClose={() => setIsMissionsOpen(false)}
           onClaimMission={handleClaimCash}
+          onSettledReward={async () => {
+            const result = await api.wallet.getBalance();
+            if (result.success) setUser(prev => ({ ...prev, balance: result.balance }));
+          }}
           onDepositSuccess={handleDepositSuccess}
           onWithdrawSuccess={handleWithdrawSuccess}
           onOpenDeposit={handleOpenDeposit}

@@ -75,7 +75,7 @@ export const NeextHubAdminVipManager: React.FC<NeextHubAdminVipManagerProps> = (
   const loadTiers = async () => {
     setIsLoading(true);
     try {
-      const res = await api.vip.getTiers();
+      const res = await api.vip.getAdminTiers();
       if (res.success && Array.isArray(res.tiers)) {
         setTiers(res.tiers);
       } else {

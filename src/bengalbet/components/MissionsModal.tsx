@@ -63,6 +63,7 @@ interface MissionsModalProps {
   initialSigninSubTab?: 'new_member' | 'daily_signin';
   onClose: () => void;
   onClaimMission?: (amount: number, title: string) => void;
+  onSettledReward?: () => void;
   onDepositSuccess?: (amount: number) => void;
   onWithdrawSuccess?: (amount: number) => void;
   onOpenDeposit?: () => void;
@@ -126,6 +127,7 @@ export const MissionsModal: React.FC<MissionsModalProps> = ({
   initialSigninSubTab,
   onClose,
   onClaimMission,
+  onSettledReward,
   onDepositSuccess,
   onWithdrawSuccess,
   onOpenDeposit,
@@ -578,6 +580,7 @@ export const MissionsModal: React.FC<MissionsModalProps> = ({
           </div>
         ) : activeSidebarMenu === 'reward_center' ? (
           <RewardCenterView
+            onSettledReward={onSettledReward}
             user={user}
             initialRightView={rewardCenterTab}
             initialSigninTab={signinSubTab}

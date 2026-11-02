@@ -11,6 +11,7 @@ describe('Credential request boundaries', () => {
     expect(mayAttachAdminCredential('/api/admin/daily-signin/config', 'POST')).toBe(true);
     expect(mayAttachAdminCredential('/api/vip/tiers', 'POST')).toBe(true);
     expect(mayAttachAdminCredential('/api/vip/tiers', 'GET')).toBe(false);
+    expect(mayAttachAdminCredential('/api/admin/vip/tiers', 'GET')).toBe(true);
   });
   it('does not forward either credential to an absolute URL', () => {
     expect(mayAttachAdminCredential('https://example.com/api/admin/stats')).toBe(false);

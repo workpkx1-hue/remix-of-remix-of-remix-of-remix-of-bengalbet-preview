@@ -33,6 +33,7 @@ import {
 import confetti from 'canvas-confetti';
 import { UserAccount, RescueTierRecord, PromoCodeRecord, UserTicketRecord } from '../types';
 import { api } from '../services/api';
+import { refreshSettledReward } from '../services/settledReward';
 import { MysteryRewardModal } from './MysteryRewardModal';
 
 interface RewardCenterViewProps {
@@ -46,6 +47,7 @@ interface RewardCenterViewProps {
   onOpenMysteryReward?: () => void;
   onClaimCoupon?: (couponId: number, name: string) => void;
   onClaimSuccess?: (amount: number, title: string) => void;
+  onSettledReward?: () => void;
   onOpenInvite?: () => void;
   onOpenVip?: () => void;
   onBack?: () => void;
@@ -213,6 +215,7 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
   onOpenMysteryReward,
   onClaimCoupon,
   onClaimSuccess,
+  onSettledReward,
   onOpenInvite,
   onOpenVip,
   onBack,
@@ -273,10 +276,14 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
     return () => clearTimeout(timer);
   }, [mobileView]);
 
-  const [signedDays, setSignedDays] = useState<number[]>([1]);
+  const [signedDays, setSignedDays] = useState<number[]>([]);
   const [signinStreak, setSigninStreak] = useState(0);
   const [signinTotalBonus, setSigninTotalBonus] = useState(0);
   const [hasSignedToday, setHasSignedToday] = useState(false);
+  const [signinDay, setSigninDay] = useState<number | null>(null);
+  const [signinEligible, setSigninEligible] = useState(false);
+  const [signinBusy, setSigninBusy] = useState(false);
+  const [signinError, setSigninError] = useState<string | null>(null);
   const [signinDaysData, setSigninDaysData] = useState<{ day: number; bonus: number }[]>([]);
 
   // Promo Code State (Capture 4)
@@ -317,6 +324,9 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
         setSigninStreak(signData.currentStreak || signData.streak || 0);
         setSigninTotalBonus(signData.totalClaimedBonus || signData.totalBonus || 0);
         setHasSignedToday(signData.hasSignedToday);
+        setSigninDay(signData.todayDayNumber ?? null);
+        setSigninEligible(signData.isEligible === true);
+        setSignedDays([]);
         if (signData.history && signData.history.length > 0) {
           const days = signData.history.map((h: any) => h.day);
           setSignedDays(Array.from(new Set([...days])));
@@ -325,6 +335,8 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
           setSigninDaysData(signData.config.days);
         }
       }
+
+      if (!signRes?.success) { setSigninEligible(false); setSigninDay(null); setSigninDaysData([]); }
 
       if (rescueRes && rescueRes.success) {
         const rescueData = (rescueRes as any).status || rescueRes;
@@ -543,45 +555,24 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
   };
 
   // 30-Day Daily Sign-in action
-  const handleSignInDay = async (day: number, bonus: number) => {
-    if (signedDays.includes(day)) return;
-
+  const handleSignInDay = async (day: number, _bonus: number) => {
+    if (signinBusy || !signinEligible || hasSignedToday || day !== signinDay) return;
+    setSigninBusy(true);
+    setSigninError(null);
     try {
       const res = await api.dailySignIn.claim();
-      if (res && res.success) {
-        setSignedDays(prev => Array.from(new Set([...prev, res.record.day])));
-        setSigninStreak(res.record.streak);
-        setSigninTotalBonus(prev => prev + res.record.bonus);
-        setHasSignedToday(true);
-        if (onClaimSuccess) {
-          onClaimSuccess(res.record.bonus, `দিন ${res.record.day} সাইন-ইন বোনাস (+৳${res.record.bonus.toFixed(2)})`);
-        }
-        confetti({ particleCount: 65, spread: 70, origin: { y: 0.5 } });
-        loadRewardBackendData();
-        return;
-      }
+      if (!res.success || typeof res.bonus !== 'number') throw new Error('দৈনিক পুরস্কার নিশ্চিত হয়নি।');
+      setHasSignedToday(true);
+      setSigninEligible(false);
+      setSignedDays(prev => Array.from(new Set([...prev, res.dayNumber])));
+      setSigninStreak(res.streak);
+      await refreshSettledReward(res, onSettledReward);
+      await loadRewardBackendData();
+      confetti({ particleCount: 65, spread: 70, origin: { y: 0.5 } });
     } catch (e: any) {
-      console.warn('Daily signin claim note:', e);
-    }
-
-    // Client fallback
-    setSignedDays(prev => [...prev, day]);
-    setSigninStreak(prev => prev + 1);
-    setSigninTotalBonus(prev => prev + bonus);
-    if (onClaimSuccess) {
-      onClaimSuccess(bonus, `দিন ${day} সাইন-ইন বোনাস (+৳${bonus})`);
-    }
-    try {
-      await api.rewards.claim('signin', bonus, `দিন ${day} সাইন-ইন বোনাস (+৳${bonus})`);
-    } catch (e) {
-      console.warn('Could not sync signin with backend:', e);
-    }
-
-    confetti({
-      particleCount: 65,
-      spread: 70,
-      origin: { y: 0.5 }
-    });
+      setSigninError(e.message || 'দৈনিক পুরস্কার গ্রহণ করা যায়নি।');
+      await loadRewardBackendData();
+    } finally { setSigninBusy(false); }
   };
 
   const signin12DaysData = [
@@ -599,38 +590,7 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
     { day: 12, icon: '🎯', bonus: 1200, task: '১০,০০০ টাকা বাজি ধরুন' },
   ];
 
-  const signin30DaysData = [
-    { day: 1, bonus: 1.00 },
-    { day: 2, bonus: 2.00 },
-    { day: 3, bonus: 5.00 },
-    { day: 4, bonus: 6.00 },
-    { day: 5, bonus: 8.00 },
-    { day: 6, bonus: 10.00 },
-    { day: 7, bonus: 12.00 },
-    { day: 8, bonus: 15.00 },
-    { day: 9, bonus: 16.00 },
-    { day: 10, bonus: 18.00 },
-    { day: 11, bonus: 20.00 },
-    { day: 12, bonus: 22.00 },
-    { day: 13, bonus: 25.00 },
-    { day: 14, bonus: 26.00 },
-    { day: 15, bonus: 28.00 },
-    { day: 16, bonus: 30.00 },
-    { day: 17, bonus: 32.00 },
-    { day: 18, bonus: 35.00 },
-    { day: 19, bonus: 36.00 },
-    { day: 20, bonus: 38.00 },
-    { day: 21, bonus: 40.00 },
-    { day: 22, bonus: 40.00 },
-    { day: 23, bonus: 40.00 },
-    { day: 24, bonus: 40.00 },
-    { day: 25, bonus: 40.00 },
-    { day: 26, bonus: 45.00 },
-    { day: 27, bonus: 45.00 },
-    { day: 28, bonus: 50.00 },
-    { day: 29, bonus: 50.00 },
-    { day: 30, bonus: 60.00 },
-  ];
+  const signin30DaysData = signinDaysData;
 
   // Promo code redemption
   const handleApplyPromo = async (codeToRedeem?: string) => {
@@ -644,9 +604,7 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
       const res = await api.promos.redeem(code);
       if (res && res.success) {
         setPromoFeedback(`অভিনন্দন! কোড "${code}" সফলভাবে রিডিম হয়েছে। ৳ ${res.bonusAmount.toFixed(2)} বোনাস আপনার অ্যাকাউন্টে যোগ হয়েছে।`);
-        if (onClaimSuccess) {
-          onClaimSuccess(res.bonusAmount, `প্রচার কোড (${code}) বোনাস (+৳${res.bonusAmount.toFixed(2)})`);
-        }
+        await refreshSettledReward(res, onSettledReward);
         confetti({
           particleCount: 60,
           spread: 65,
@@ -672,9 +630,7 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
       if (res && res.success) {
         setRescueClaimed(true);
         setRescueFeedback(`অভিনন্দন! ৳ ${res.claim.bonusAmount.toFixed(2)} উদ্ধার তহবিল সফলভাবে আপনার ব্যালেন্সে যোগ হয়েছে।`);
-        if (onClaimSuccess) {
-          onClaimSuccess(res.claim.bonusAmount, `দৈনিক উদ্ধার তহবিল সহায়তা (+৳${res.claim.bonusAmount.toFixed(2)})`);
-        }
+        await refreshSettledReward(res, onSettledReward);
         confetti({
           particleCount: 60,
           spread: 65,
@@ -1437,9 +1393,10 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
         ) : (
           /* 30-Day Cards Grid with identical 3D Banknote Stacks as Mobile */
           <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-2.5 flex-1">
+            {signinError && <p role="alert" className="text-destructive col-span-full text-sm">{signinError}</p>}
             {signin30DaysData.map((item) => {
-              const isClaimed = signedDays.includes(item.day);
-              const isTodayActive = item.day === (signedDays.length + 1) || (signedDays.length === 0 && item.day === 1);
+              const isClaimed = hasSignedToday && item.day === signinDay;
+              const isTodayActive = signinEligible && item.day === signinDay;
 
               return (
                 <div
@@ -1534,7 +1491,8 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
                   {/* Claim Button */}
                   <div className="p-1 bg-white border-t border-gray-100">
                     <button
-                      disabled={isClaimed}
+                      aria-label={`দিন ${item.day} দৈনিক পুরস্কার দাবি`}
+                      disabled={isClaimed || !isTodayActive || signinBusy}
                       onClick={() => handleSignInDay(item.day, item.bonus)}
                       className={`w-full py-1 rounded-lg text-[10.5px] font-bold font-bengali transition-all cursor-pointer ${
                         isClaimed
@@ -1852,9 +1810,10 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
           </div>
         ) : (
           <div className="grid grid-cols-3 gap-2.5">
+            {signinError && <p role="alert" className="text-destructive col-span-full text-sm">{signinError}</p>}
             {signin30DaysData.map((item) => {
-              const isClaimed = signedDays.includes(item.day);
-              const isTodayActive = item.day === (signedDays.length + 1) || (signedDays.length === 0 && item.day === 1);
+              const isClaimed = hasSignedToday && item.day === signinDay;
+              const isTodayActive = signinEligible && item.day === signinDay;
 
               return (
                 <div
@@ -1955,7 +1914,8 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
 
                     {/* Sign-in Pill Button matching Capture2.PNG */}
                     <button
-                      disabled={isClaimed}
+                      aria-label={`দিন ${item.day} দৈনিক পুরস্কার দাবি`}
+                      disabled={isClaimed || !isTodayActive || signinBusy}
                       onClick={() => handleSignInDay(item.day, item.bonus)}
                       className={`w-full mt-2 py-1 rounded-full text-xs font-bold font-bengali transition-all shadow-xs cursor-pointer ${
                         isClaimed
@@ -3381,9 +3341,7 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
         onClose={() => setIsMysteryModalOpen(false)}
         user={user}
         onClaimSuccess={(amount, note) => {
-          if (onClaimSuccess) {
-            onClaimSuccess(amount, note);
-          }
+          if (onSettledReward) onSettledReward();
           loadRewardBackendData();
         }}
       />
