@@ -19,3 +19,5 @@
 
 - Completed server reward settlements notify the parent through onSettledReward for read-only wallet refresh; never forward them to the generic reward-claim callback, which would credit twice.
 - Keep external PHP reward-source mirrors under server/dbserver/api for review; they are not the TanStack app runtime and live uploads require authenticated connector operations.
+
+- New-member task claims submit only the task day to the dedicated server handler; server task state owns eligibility/claim status and settled wallet refresh prevents generic duplicate credits.

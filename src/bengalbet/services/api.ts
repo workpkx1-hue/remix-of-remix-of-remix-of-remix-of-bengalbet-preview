@@ -1254,6 +1254,10 @@ export const api = {
   // -------------------------------------------------------------------------
   // DAILY SIGN-IN (দৈনিক সাইন-ইন কাজ)
   // -------------------------------------------------------------------------
+  newMember: {
+    getStatus: () => request<{ success: boolean; tasks: any[] }>('/api/daily-signin/new-member-status'),
+    claim: (day: number) => request<{ success: boolean; day: number; bonus: number; newBalance: number }>('/api/daily-signin/new-member-claim', { method: 'POST', body: JSON.stringify({ day }) }),
+  },
   dailySignIn: {
     async getStatus() {
       return request<{
