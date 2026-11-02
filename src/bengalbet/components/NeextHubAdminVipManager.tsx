@@ -35,7 +35,7 @@ export const NeextHubAdminVipManager: React.FC<NeextHubAdminVipManagerProps> = (
   onRefreshUsers,
   onRefreshSiteUser
 }) => {
-  const [tiers, setTiers] = useState<VipTierConfig[]>(DEFAULT_TIERS);
+  const [tiers, setTiers] = useState<VipTierConfig[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [activeModal, setActiveModal] = useState<'add' | 'edit' | 'delete' | 'user_override' | 'claims_log' | null>(null);
   
@@ -76,14 +76,14 @@ export const NeextHubAdminVipManager: React.FC<NeextHubAdminVipManagerProps> = (
     setIsLoading(true);
     try {
       const res = await api.vip.getTiers();
-      if (res.success && res.tiers && res.tiers.length > 0) {
+      if (res.success && Array.isArray(res.tiers)) {
         setTiers(res.tiers);
       } else {
-        setTiers(DEFAULT_TIERS);
+        throw new Error('VIP তালিকা পাওয়া যায়নি।');
       }
     } catch (e) {
-      console.error('Error loading VIP tiers:', e);
-      setTiers(DEFAULT_TIERS);
+      setTiers([]);
+      showToast('error', language === 'bn' ? 'VIP তালিকা লোড হয়নি। আবার চেষ্টা করুন।' : 'VIP tiers could not be loaded. Try again.');
     } finally {
       setIsLoading(false);
     }

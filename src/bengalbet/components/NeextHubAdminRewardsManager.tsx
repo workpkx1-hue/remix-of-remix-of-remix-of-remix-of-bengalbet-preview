@@ -93,7 +93,9 @@ export const NeextHubAdminRewardsManager: React.FC<NeextHubAdminRewardsManagerPr
       if (cfgRes.success) setSigninConfig(cfgRes.config);
       if (recRes.success) setSigninRecords(recRes.records);
     } catch (e: any) {
-      console.error('Sign-in load error:', e);
+      setSigninConfig(null);
+      setSigninRecords([]);
+      showToast('সাইন-ইনের সেটিংস ও রেকর্ড লোড হয়নি। আবার চেষ্টা করুন।');
     } finally {
       setIsLoading(false);
     }
