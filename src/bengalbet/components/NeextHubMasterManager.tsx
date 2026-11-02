@@ -1024,7 +1024,7 @@ export const NeextHubMasterManager: React.FC<NeextHubMasterManagerProps> = ({
                     type={showKeyPassword ? 'text' : 'password'}
                     value={cfgMasterKey}
                     onChange={(e) => setCfgMasterKey(e.target.value)}
-                    placeholder="bengalbet_master_secret_2026_xyz99"
+                    placeholder="Admin Master Key"
                     className="w-full bg-[#02100a] border border-emerald-500/30 rounded-xl px-3.5 py-2.5 pr-10 text-xs text-white font-mono outline-none focus:border-amber-400"
                   />
                   <button

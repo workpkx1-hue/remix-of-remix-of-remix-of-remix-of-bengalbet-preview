@@ -45,9 +45,9 @@ export const AuthModals: React.FC<AuthModalsProps> = ({
   onOpenPromoTerms
 }) => {
   const [mode, setMode] = useState<'login' | 'register' | 'forgot'>(initialMode);
-  const [phone, setPhone] = useState('01615249856');
-  const [password, setPassword] = useState('123456');
-  const [confirmPassword, setConfirmPassword] = useState('123456');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);

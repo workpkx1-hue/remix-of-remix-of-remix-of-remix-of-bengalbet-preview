@@ -16,25 +16,31 @@ const getInitialConfig = () => {
       return {
         rootDomain: ((parsed.rootDomain && !String(parsed.rootDomain).includes('neexthub')) ? parsed.rootDomain : 'https://server.nexarofx.com').replace(/\/+$/, ''),
         path: parsed.path !== undefined ? parsed.path : '/dbserver',
-        masterKey: parsed.masterKey || 'bengalbet_master_secret_2026_xyz99'
+        masterKey: ''
       };
     }
   } catch {}
   return {
     rootDomain: 'https://server.nexarofx.com',
     path: '/dbserver',
-    masterKey: 'bengalbet_master_secret_2026_xyz99'
+    masterKey: ''
   };
 };
 
 const _configState = getInitialConfig();
 
+// Old sessions (before signed tokens) must sign in again
+try {
+  if (localStorage.getItem('bengalbet_user_session') && !localStorage.getItem('bengalbet_auth_token')) {
+    localStorage.removeItem('bengalbet_user_session');
+  }
+} catch {}
+
 const persistConfig = () => {
   try {
     localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify({
       rootDomain: _configState.rootDomain,
-      path: _configState.path,
-      masterKey: _configState.masterKey
+      path: _configState.path
     }));
   } catch {}
 };
@@ -54,12 +60,15 @@ export const REST_API_CONFIG = {
     _configState.path = val.trim();
     persistConfig();
   },
+  // Admin master key lives only in this browser tab's session, never in the code
   get masterKey() {
-    return _configState.masterKey;
+    try { return sessionStorage.getItem('bengalbet_admin_key') || ''; } catch { return ''; }
   },
   set masterKey(val: string) {
-    _configState.masterKey = val.trim();
-    persistConfig();
+    try {
+      if (val.trim()) sessionStorage.setItem('bengalbet_admin_key', val.trim());
+      else sessionStorage.removeItem('bengalbet_admin_key');
+    } catch {}
   },
   get baseUrl() {
     const p = this.path ? (this.path.startsWith('/') ? this.path : `/${this.path}`) : '';
@@ -77,14 +86,13 @@ export const REST_API_CONFIG = {
       _configState.path = newConf.path.trim();
     }
     if (newConf.masterKey !== undefined) {
-      _configState.masterKey = newConf.masterKey.trim();
+      this.masterKey = newConf.masterKey;
     }
     persistConfig();
   },
   resetToDefaults() {
     _configState.rootDomain = 'https://server.nexarofx.com';
     _configState.path = '/dbserver';
-    _configState.masterKey = 'bengalbet_master_secret_2026_xyz99';
     persistConfig();
   }
 };
@@ -151,13 +159,10 @@ export const clearDatabaseServerError = () => {
 
 const getAuthToken = (): string => {
   try {
-    const cached = localStorage.getItem('bengalbet_user_session') || localStorage.getItem('bdt222_user_session');
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      if (parsed?.id) return `Bearer ${parsed.id}`;
-    }
+    const token = localStorage.getItem('bengalbet_auth_token');
+    if (token) return `Bearer ${token}`;
   } catch {}
-  return 'Bearer usr-889922';
+  return '';
 };
 
 const buildApiUrl = (endpoint: string): string => {
@@ -172,8 +177,8 @@ const request = async <T = any>(endpoint: string, options: RequestInit = {}): Pr
   const targetUrl = buildApiUrl(endpoint);
   const headers = {
     'Content-Type': 'application/json',
-    'Authorization': getAuthToken(),
-    'X-Master-Key': REST_API_CONFIG.masterKey,
+    ...(getAuthToken() ? { 'Authorization': getAuthToken() } : {}),
+    ...(REST_API_CONFIG.masterKey ? { 'X-Master-Key': REST_API_CONFIG.masterKey } : {}),
     ...(options.headers || {})
   };
 
@@ -206,6 +211,11 @@ const request = async <T = any>(endpoint: string, options: RequestInit = {}): Pr
     }
 
     const data = await response.json();
+
+    // Save the signed session token returned by login/register
+    if (data && typeof data.token === 'string' && data.token.startsWith('v1.')) {
+      try { localStorage.setItem('bengalbet_auth_token', data.token); } catch {}
+    }
 
     // Check if database disconnected was reported inside body
     if (data && data.mysql && data.mysql.connected === false) {
@@ -252,8 +262,8 @@ const masterRequest = async <T = any>(params: Record<string, any> = {}, options:
 
   const headers = {
     'Content-Type': 'application/json',
-    'Authorization': getAuthToken(),
-    'X-Master-Key': REST_API_CONFIG.masterKey,
+    ...(getAuthToken() ? { 'Authorization': getAuthToken() } : {}),
+    ...(REST_API_CONFIG.masterKey ? { 'X-Master-Key': REST_API_CONFIG.masterKey } : {}),
     ...(options.headers || {})
   };
 
@@ -298,6 +308,11 @@ const masterRequest = async <T = any>(params: Record<string, any> = {}, options:
 };
 
 export const api = {
+  // Public health check (no admin key needed): settings endpoint touches the database
+  async health() {
+    const res = await request<any>('/api/settings');
+    return { ...res, success: !!res?.success, mysql: { connected: !!res?.success, version: '' } };
+  },
   auth: {
     async login(phone: string, password: string) {
       return request<{ success: boolean; message: string; token: string; user: UserAccount }>('/api/auth/login', {

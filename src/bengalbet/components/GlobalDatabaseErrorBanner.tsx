@@ -61,7 +61,7 @@ export const GlobalDatabaseErrorBanner: React.FC<GlobalDatabaseErrorBannerProps>
     });
 
     // Initial background health check
-    api.master.ping().then(res => {
+    api.health().then(res => {
       if (res && res.mysql && res.mysql.connected === false) {
         setDatabaseServerError({
           errorMessage: 'MySQL Database not connected on remote server: ' + (res.mysql.version || 'Offline'),
@@ -85,7 +85,7 @@ export const GlobalDatabaseErrorBanner: React.FC<GlobalDatabaseErrorBannerProps>
     setIsRetrying(true);
     setTestResult(null);
     try {
-      const res = await api.master.ping();
+      const res = await api.health();
       if (res.success && res.mysql?.connected !== false) {
         clearDatabaseServerError();
         setIsDismissed(true);
@@ -314,7 +314,7 @@ export const GlobalDatabaseErrorBanner: React.FC<GlobalDatabaseErrorBannerProps>
                   type="text"
                   value={inputMasterKey}
                   onChange={(e) => setInputMasterKey(e.target.value)}
-                  placeholder="bengalbet_master_secret_2026_xyz99"
+                  placeholder="Admin Master Key"
                   className="w-full bg-[#1b1f24] border border-zinc-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono outline-none transition"
                 />
               </div>
