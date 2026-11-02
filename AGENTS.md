@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - The imported BengalBet SPA lives in src/bengalbet (marked @ts-nocheck) and is rendered client-only by src/routes/index.tsx and the catch-all src/routes/$.tsx, because it does its own path-based view switching.
+- Normalize public API origin and directory through the shared apiConfig module to prevent duplicated URL paths; operational credentials belong in the server-side connector, never frontend environment files.
