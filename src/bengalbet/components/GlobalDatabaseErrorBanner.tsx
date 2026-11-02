@@ -61,7 +61,7 @@ export const GlobalDatabaseErrorBanner: React.FC<GlobalDatabaseErrorBannerProps>
     });
 
     // Initial background health check
-    api.master.ping().then(res => {
+    api.health().then(res => {
       if (res && res.mysql && res.mysql.connected === false) {
         setDatabaseServerError({
           errorMessage: 'MySQL Database not connected on remote server: ' + (res.mysql.version || 'Offline'),
@@ -85,7 +85,7 @@ export const GlobalDatabaseErrorBanner: React.FC<GlobalDatabaseErrorBannerProps>
     setIsRetrying(true);
     setTestResult(null);
     try {
-      const res = await api.master.ping();
+      const res = await api.health();
       if (res.success && res.mysql?.connected !== false) {
         clearDatabaseServerError();
         setIsDismissed(true);

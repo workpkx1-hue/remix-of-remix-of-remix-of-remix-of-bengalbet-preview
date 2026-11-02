@@ -308,6 +308,11 @@ const masterRequest = async <T = any>(params: Record<string, any> = {}, options:
 };
 
 export const api = {
+  // Public health check (no admin key needed): settings endpoint touches the database
+  async health() {
+    const res = await request<any>('/api/settings');
+    return { ...res, success: !!res?.success, mysql: { connected: !!res?.success, version: '' } };
+  },
   auth: {
     async login(phone: string, password: string) {
       return request<{ success: boolean; message: string; token: string; user: UserAccount }>('/api/auth/login', {
