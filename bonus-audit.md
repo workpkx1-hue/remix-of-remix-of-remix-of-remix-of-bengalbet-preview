@@ -1,6 +1,8 @@
 # Bonus alignment audit — 2026-11-02
 
 ## Verified live
+- Follow-up at 04:23 UTC: the user-supplied administrator credential was accepted by the actual admin login page (HTTP 200 and authenticated session). It was used once and not added to project files. This verifies the legacy login only, not a separate scoped admin identity or all admin sections.
+- Follow-up wallet check: the same audit member logged in, balance read twice as 500, wallet-card and transaction reads succeeded, and the successful 500 welcome-bonus transaction matched the balance. No financial mutation was performed.
 - The newly linked BengalBet Server connection can read the current PHP source and database schema.
 - All five administrator sections return HTTP 404: daily-signin/config, vip/stats, rescue/tiers, promos, mystery-reward/config. These are missing PHP handlers, not merely frontend navigation failures.
 - One new isolated audit member registered through the browser; the same account subsequently logged in successfully. No other member was accessed.
@@ -27,6 +29,6 @@ Marketing promises therefore cannot be certified: signup → benefit eligibility
 
 ## Blocked work
 - Adding or modifying live administrator/financial handlers requires a protected restorable backup and a separate staging DBServer with isolated funds. Neither has been supplied or verified. No live PHP uploads were made.
-- Authenticated admin browser checks require a distinct scoped administrator session. The operational connector credential must not be copied into browser storage as a login.
+- Full privileged admin workflow checks still require a distinct scoped administrator session. The legacy user-entered admin login succeeded, but the operational connector credential must not be copied into browser storage as a login.
 - Source inspection found a universal password fallback in live auth.php; this needs removal and staging regression before marketing or real-money use. No attempt was made to exploit it or access another member.
 - Award claims, duplicate/concurrent settlement, editable admin settings, referral eligibility and all other promotion types remain unverified end-to-end.
