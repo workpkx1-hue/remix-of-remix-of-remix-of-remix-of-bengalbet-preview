@@ -21,3 +21,4 @@
 - Keep external PHP reward-source mirrors under server/dbserver/api for review; they are not the TanStack app runtime and live uploads require authenticated connector operations.
 
 - New-member task claims submit only the task day to the dedicated server handler; server task state owns eligibility/claim status and settled wallet refresh prevents generic duplicate credits.
+- New-member task definitions are persisted in one server configuration consumed by status and claims; admin edits require validated twelve-day definitions and readback verification, and member labels derive from those same definitions.

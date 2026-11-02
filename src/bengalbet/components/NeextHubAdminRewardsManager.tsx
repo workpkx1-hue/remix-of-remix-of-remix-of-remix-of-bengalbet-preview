@@ -42,6 +42,7 @@ import {
   MysteryCashCardRecord
 } from '../types';
 import { api } from '../services/api';
+import { AdminMemberTasks } from './AdminMemberTasks';
 
 interface NeextHubAdminRewardsManagerProps {
   language: 'bn' | 'en';
@@ -719,6 +720,7 @@ export const NeextHubAdminRewardsManager: React.FC<NeextHubAdminRewardsManagerPr
       {/* ========================================================================= */}
       {activeSubTab === 'signin' && (
         <div className="space-y-4">
+          <AdminMemberTasks />
           {/* Action Bar */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-[#072418] p-3.5 rounded-xl border border-emerald-700/40">
             <div className="flex items-center gap-2 flex-1">
