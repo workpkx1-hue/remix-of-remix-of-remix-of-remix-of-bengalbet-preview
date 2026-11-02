@@ -34,6 +34,7 @@ import confetti from 'canvas-confetti';
 import { UserAccount, RescueTierRecord, PromoCodeRecord, UserTicketRecord } from '../types';
 import { api } from '../services/api';
 import { refreshSettledReward } from '../services/settledReward';
+import { mayClaimMemberTask } from '../services/memberTaskState';
 import { MysteryRewardModal } from './MysteryRewardModal';
 
 interface RewardCenterViewProps {
@@ -535,7 +536,7 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
   const [memberBusy, setMemberBusy] = useState(false);
   const [memberError, setMemberError] = useState<string | null>(null);
   const handleSignIn12Day = async (day: number, _bonus: number, _task: string) => {
-    if (memberBusy || !memberTasks.find(t => t.day === day)?.eligible) return;
+    if (!mayClaimMemberTask(memberTasks, day, memberBusy)) return;
     setMemberBusy(true); setMemberError(null);
     try {
       const result = await api.newMember.claim(day);
