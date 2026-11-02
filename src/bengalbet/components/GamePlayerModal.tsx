@@ -53,10 +53,15 @@ interface GamePlayerModalProps {
 export const GamePlayerModal: React.FC<GamePlayerModalProps> = ({
   game,
   language,
-  user,
+  user: account,
   onClose,
-  onUpdateBalance
+  onUpdateBalance: _onUpdateCashBalance
 }) => {
+  const [simulationBalance, setSimulationBalance] = useState(2500);
+  const user = { ...account, balance: simulationBalance };
+  const onUpdateBalance = (value: number) => {
+    if (Number.isFinite(value) && value >= 0) setSimulationBalance(value);
+  };
   const [currentSubGame, setCurrentSubGame] = useState<'classic' | 'superace2' | 'deluxe' | null>(() => {
     if (!game) return null;
     const isSuperAce2 =
