@@ -32,6 +32,7 @@ import {
   ArrowUpDown
 } from 'lucide-react';
 import { api } from '../services/api';
+import { mayProcessPayment } from '../services/paymentActions';
 
 export interface AdminTransaction {
   id: string;
@@ -250,11 +251,12 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
     if (selectedTxIds.length === filteredTransactions.length) {
       setSelectedTxIds([]);
     } else {
-      setSelectedTxIds(filteredTransactions.map((t) => t.id));
+      setSelectedTxIds(filteredTransactions.filter(mayProcessPayment).map((t) => t.id));
     }
   };
 
   const toggleSelectTx = (id: string) => {
+    if (!mayProcessPayment(transactions.find(tx => tx.id === id))) return;
     setSelectedTxIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
@@ -279,6 +281,7 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
     customNote?: string,
     customReason?: string
   ) => {
+    if (!mayProcessPayment(transactions.find(tx => tx.id === id)) || !['success', 'rejected'].includes(newStatus)) return;
     setIsSubmittingAction(true);
     try {
       const res = await api.admin.updateTransactionStatus(id, newStatus, {
@@ -302,7 +305,7 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
   };
 
   const handleDetailedReviewSubmit = async (status: 'success' | 'rejected' | 'processing' | 'flagged') => {
-    if (!selectedTxForReview) return;
+    if (!mayProcessPayment(selectedTxForReview) || !['success', 'rejected'].includes(status)) return;
 
     if (status === 'rejected' && !processRejectionReason.trim()) {
       alert('বাতিলের কারণ উল্লেখ করুন');
@@ -314,8 +317,6 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
       const res = await api.admin.updateTransactionStatus(selectedTxForReview.id, status, {
         adminNote: processAdminNote.trim() || undefined,
         rejectionReason: status === 'rejected' ? processRejectionReason.trim() : undefined,
-        bonusAdjust: processBonusAdjust ? Number(processBonusAdjust) : undefined,
-        feeAdjust: processFeeAdjust ? Number(processFeeAdjust) : undefined,
         notifyUser: shouldNotifyUser
       });
 
@@ -455,7 +456,7 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
 
     setIsSubmittingAction(true);
     try {
-      const res = await api.admin.editTransaction(selectedTxForEdit.id, editTxData);
+      const res = await api.admin.editTransaction(selectedTxForEdit.id, { adminNote: editTxData.adminNote || '' });
       if (res.success) {
         showToast(res.message);
         setSelectedTxForEdit(null);
@@ -709,7 +710,8 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
             {/* Create Manual Transaction */}
             <button
               type="button"
-              onClick={() => setIsCreateModalOpen(true)}
+              disabled
+              title="লেনদেনের ইতিহাস সরাসরি তৈরি করা বন্ধ"
               className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-300 hover:to-amber-400 text-black font-bold text-xs flex items-center gap-1.5 shadow-md shadow-yellow-500/20 cursor-pointer transition-all"
             >
               <Plus className="w-4 h-4" />
@@ -1162,7 +1164,7 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
                       </button>
 
                       {/* Quick Actions for Pending / Processing */}
-                      {(tx.status === 'pending' || tx.status === 'processing') && (
+                      {mayProcessPayment(tx) && (
                         <>
                           <button
                             type="button"
@@ -1206,7 +1208,8 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
                       {/* Quick Delete */}
                       <button
                         type="button"
-                        onClick={() => setTxToDelete(tx)}
+                        disabled
+                        aria-label="লেনদেনের ইতিহাস মুছে ফেলা বন্ধ"
                         className="p-1.5 rounded-xl bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 cursor-pointer transition-colors"
                         title="মুছে ফেলুন"
                       >
@@ -1340,6 +1343,7 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
                   </label>
                   <input
                     type="number"
+                    disabled
                     value={processBonusAdjust}
                     onChange={(e) => setProcessBonusAdjust(e.target.value)}
                     placeholder="যেমন: 77"
@@ -1419,7 +1423,7 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
               {/* Approve */}
               <button
                 type="button"
-                disabled={isSubmittingAction}
+                disabled={isSubmittingAction || !mayProcessPayment(selectedTxForReview)}
                 onClick={() => handleDetailedReviewSubmit('success')}
                 className="py-2.5 rounded-xl bg-green-500 hover:bg-green-400 text-black font-black text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-green-500/20"
               >
@@ -1749,6 +1753,7 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
                 <input
                   type="text"
                   required
+                  readOnly
                   value={editTxData.trxId || ''}
                   onChange={(e) => setEditTxData({ ...editTxData, trxId: e.target.value })}
                   className="w-full bg-[#051c13] border border-emerald-700 rounded-xl px-3 py-2 text-xs text-white font-mono"
@@ -1762,6 +1767,7 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
                     type="number"
                     step="any"
                     required
+                    readOnly
                     value={editTxData.amount || ''}
                     onChange={(e) => setEditTxData({ ...editTxData, amount: e.target.value })}
                     className="w-full bg-[#051c13] border border-emerald-700 rounded-xl px-3 py-2 text-xs text-white font-mono"
@@ -1773,6 +1779,7 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
                   <input
                     type="number"
                     step="any"
+                    readOnly
                     value={editTxData.bonus || 0}
                     onChange={(e) => setEditTxData({ ...editTxData, bonus: e.target.value })}
                     className="w-full bg-[#051c13] border border-emerald-700 rounded-xl px-3 py-2 text-xs text-white font-mono"
@@ -1784,6 +1791,7 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
                 <label className="block text-xs text-gray-300 mb-1">অ্যাকাউন্ট নম্বর / ফোন:</label>
                 <input
                   type="text"
+                  readOnly
                   value={editTxData.accountNumber || ''}
                   onChange={(e) => setEditTxData({ ...editTxData, accountNumber: e.target.value })}
                   className="w-full bg-[#051c13] border border-emerald-700 rounded-xl px-3 py-2 text-xs text-white font-mono"

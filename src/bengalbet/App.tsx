@@ -1039,7 +1039,7 @@ export default function App() {
               }).catch(() => {});
             }
           }}
-          onUpdateBalance={(newBal) => setUser(prev => ({ ...prev, balance: newBal }))}
+          onUpdateBalance={() => { /* Client game outcomes must not modify the cash wallet. */ }}
         />
       )}
 

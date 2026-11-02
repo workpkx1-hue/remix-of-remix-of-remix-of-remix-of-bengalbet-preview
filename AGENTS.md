@@ -23,3 +23,4 @@
 - New-member task claims submit only the task day to the dedicated server handler; server task state owns eligibility/claim status and settled wallet refresh prevents generic duplicate credits.
 - New-member task definitions are persisted in one server configuration consumed by status and claims; admin edits require validated twelve-day definitions and readback verification, and member labels derive from those same definitions.
 - External payment status changes use a transactional pending-to-final guard with locked transaction/user rows; finalized states are immutable and repeated identical decisions cannot credit or refund twice.
+- Client-generated game outcomes are simulation-only and cannot update shared cash balances or submit automatic cash settlements; trusted server rounds are required before enabling real-money game settlement.
