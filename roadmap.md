@@ -1,7 +1,7 @@
 # Remaining work
 
 Latest request: editable root environment configuration shared by user/admin panels, guest-accessible setup on connection failure, and PIN/one-click live logins. Implement the non-secret default URL configuration only; do not expose operational credentials or allow unauthenticated configuration changes/live account bypasses. Separate admin password login still requires protected server-side provisioning.
-- [ ] Read the non-secret default DBServer URL from the root environment configuration and verify browser behavior.
+- [x] Read the non-secret default DBServer URL from the root environment configuration and verify browser behavior (eight focused tests passed; browser default/reset and signed-out admin verified). The URL is intentionally public; no credential was written to environment files. Admin configuration changes remain browser-local, not writes to the deployed environment file.
 
 - [ ] Verify current live-server state and establish secure, scoped administrator access and a fresh backup.
 - [ ] Fix and test administrator VIP access and daily sign-in records/settings. Live failures reproduced: VIP tiers returns 401 with operational auth, daily-signin admin config/records return 404. Frontend no longer masks VIP/signin/referral load failures; rewards tab added to mobile navigation.

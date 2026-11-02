@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest';
 import { DEFAULT_SERVER_URL, normalizeServerConfig } from '../bengalbet/services/apiConfig';
 
 describe('DBServer configuration', () => {
+  it('supports an editable non-secret default URL with a custom directory', () => {
+    expect(normalizeServerConfig('https://staging.example.com/private-api/'))
+      .toEqual({ rootDomain: 'https://staging.example.com', path: '/private-api' });
+  });
   it('uses the requested server by default', () => {
     const config = normalizeServerConfig();
     expect(`${config.rootDomain}${config.path}/`).toBe(DEFAULT_SERVER_URL);

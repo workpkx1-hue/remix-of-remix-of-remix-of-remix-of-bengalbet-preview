@@ -11,4 +11,5 @@
 
 - The imported BengalBet SPA lives in src/bengalbet (marked @ts-nocheck) and is rendered client-only by src/routes/index.tsx and the catch-all src/routes/$.tsx, because it does its own path-based view switching.
 - Normalize public API origin and directory through the shared apiConfig module to prevent duplicated URL paths; operational credentials belong in the server-side connector, never frontend environment files.
+- The root environment configuration may set the public default API URL; browser-local admin settings override that default, and reset restores it. Environment changes require a new deployment to affect the published app.
 - Keep credential forwarding decisions in requestPolicy and test member/admin boundaries; legacy browser admin access is transitional and must not be expanded into demo bypasses or unrestricted proxies.

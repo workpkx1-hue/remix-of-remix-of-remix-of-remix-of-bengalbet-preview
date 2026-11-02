@@ -9,6 +9,7 @@ import { normalizeServerConfig } from './apiConfig';
 import { mayAttachAdminCredential, mayAttachMemberCredential } from './requestPolicy';
 
 const STORAGE_KEY_CONFIG = 'bengalbet_rest_api_config';
+const getDefaultConfig = () => normalizeServerConfig(import.meta.env.VITE_DBSERVER_URL);
 
 const getInitialConfig = () => {
   try {
@@ -22,7 +23,7 @@ const getInitialConfig = () => {
     }
   } catch {}
   return {
-    ...normalizeServerConfig(),
+    ...getDefaultConfig(),
     masterKey: ''
   };
 };
@@ -89,7 +90,7 @@ export const REST_API_CONFIG = {
     persistConfig();
   },
   resetToDefaults() {
-    Object.assign(_configState, normalizeServerConfig());
+    Object.assign(_configState, getDefaultConfig());
     persistConfig();
   }
 };
