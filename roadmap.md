@@ -28,12 +28,25 @@ Latest request (2026-11-02 06:36 UTC): complete the full plan; continue implemen
 - [x] 21 permanent automated tests passed, preview build OK; both content route metadata inspected.
 
 ## Still open
+Current release blockers are not all external: remaining feature implementation and full flow testing still need work. No claim of full-plan completion or production readiness is made.
 - [ ] Daily manual-credit/reset, rescue review/manual grant and mystery manual issue/drop remain unimplemented; mystery config save not yet roundtrip-tested.
 - [ ] Complete VIP earned-tier/activity requirements and advertised weekly/monthly timing; positive rescue/mystery and concurrent settlement tests. Current guarded server handles zero-loss/expiry/date/repeat checks, but exhaustive flow proof remains open.
-- [ ] New-member days 2–12 positive boundary/concurrency/clock tests and shared administrator task configuration; frontend display definitions are still static.
+- [ ] New-member days 2–12 positive boundary/concurrency/clock tests; admin editor actual authenticated browser save still needs verification. Server config persistence and member display are now implemented.
 - [ ] End-to-end referral, deposits/withdrawals, remaining bonuses, achievements, event programs and each game's authoritative settlement.
 - [ ] Complete editable banner/program/content settings and full administrator permissions audit.
 - [ ] Full database backup/restore drill and separate scoped admin identity: hosting/identity facilities not verified.
 - [ ] Scheduled 1–2-month observation: requires provisioned scheduler/monitoring; no unattended work runs after this turn.
 - [ ] Legal/responsible-gaming and full regression release gates; not publish-ready.
 - [ ] Test-account cleanup requires precise inventory and explicit deletion approval; none deleted.
+
+## Verified 06:36 continuation
+- [x] Added server new_member_config with validated 12-day definitions; preserved existing amounts and thresholds. Admin GET/POST/readback succeeded; invalid empty list 422; guest and member requests denied. Router action recognition corrected with backup.
+- [x] Added editable admin task editor with enabled toggle, per-day requirement/amount/reward and persisted readback validation. Member labels/amounts now derive from server task definitions, no hardcoded display schedule.
+- [x] Authenticated member browser: all 12 server tasks rendered; claimed first-day button disabled; duplicate/early claim rejected; wallet unchanged; zero page errors.
+- [x] Live withdrawal now locks user row and atomically creates pending transaction/debits balance; validates configured limits, active account and destination; rejects another pending withdrawal.
+- [x] Isolated concurrent two-withdrawal check: one pending transaction, one rejection, exactly 500 debited. Below/above/negative/zero amounts rejected. Admin cancellation refunded exactly 500; repeated cancellation no extra money; finalized transition reversal rejected.
+- [x] Isolated test deposit 200 remained pending without credit; approval added stored amount+bonus=210 once. Repeated approval did not add money; subsequent rejection blocked. Test member balance read back 727.
+- [x] Live transaction status and batch actions now use pending-to-final atomic guard. Ledger deletion, direct creation and financial amount edits disabled; note edits retained. Test finalized amount edit and deletion both 409. These restrictions need matching admin presentation updates.
+- [x] 24 frontend tests and permanent PHP money/config tests passed; preview build OK. Protected source rollback copies retained; temporary installers removed.
+- [ ] Deposit submission still uses old hardcoded 5% bonus/minimum; full authoritative offer config and idempotency remain incomplete. Pending withdrawal guard blocks repeats until finalization, not durable client request-key replay across finalization.
+- [ ] Real browser withdrawal submission + admin approval interaction and complete live admin editor UI not yet exercised; server endpoint tests alone do not establish these UI flows.
