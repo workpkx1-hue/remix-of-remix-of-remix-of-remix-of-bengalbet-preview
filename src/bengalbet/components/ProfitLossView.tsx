@@ -48,7 +48,7 @@ export interface ProfitLossRecord {
   bonus: number;
 }
 
-// Profit & Loss records loaded exclusively from REST API (https://deserver.neexthub.site/dbserver/api/games.php?action=records)
+// Profit & Loss records loaded exclusively from REST API (https://server.nexarofx.com/dbserver/api/games.php?action=records)
 
 
 export const ProfitLossView: React.FC<ProfitLossViewProps> = ({ 

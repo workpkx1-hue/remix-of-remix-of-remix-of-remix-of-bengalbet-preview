@@ -14,14 +14,14 @@ const getInitialConfig = () => {
     if (saved) {
       const parsed = JSON.parse(saved);
       return {
-        rootDomain: (parsed.rootDomain || 'https://deserver.neexthub.site').replace(/\/+$/, ''),
+        rootDomain: ((parsed.rootDomain && !String(parsed.rootDomain).includes('neexthub')) ? parsed.rootDomain : 'https://server.nexarofx.com').replace(/\/+$/, ''),
         path: parsed.path !== undefined ? parsed.path : '/dbserver',
         masterKey: parsed.masterKey || 'bengalbet_master_secret_2026_xyz99'
       };
     }
   } catch {}
   return {
-    rootDomain: 'https://deserver.neexthub.site',
+    rootDomain: 'https://server.nexarofx.com',
     path: '/dbserver',
     masterKey: 'bengalbet_master_secret_2026_xyz99'
   };
@@ -82,7 +82,7 @@ export const REST_API_CONFIG = {
     persistConfig();
   },
   resetToDefaults() {
-    _configState.rootDomain = 'https://deserver.neexthub.site';
+    _configState.rootDomain = 'https://server.nexarofx.com';
     _configState.path = '/dbserver';
     _configState.masterKey = 'bengalbet_master_secret_2026_xyz99';
     persistConfig();

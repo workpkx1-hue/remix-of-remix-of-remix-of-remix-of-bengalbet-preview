@@ -49,7 +49,7 @@ export interface AccountRecordItem {
   content: string;             // কনটেন্ট / বিবরণ
   status?: 'success' | 'pending' | 'cancelled';
 }
-// Account records loaded exclusively from REST API (https://deserver.neexthub.site/dbserver/api/wallet.php?action=transactions)
+// Account records loaded exclusively from REST API (https://server.nexarofx.com/dbserver/api/wallet.php?action=transactions)
 
 
 export const AccountRecordView: React.FC<AccountRecordViewProps> = ({ 

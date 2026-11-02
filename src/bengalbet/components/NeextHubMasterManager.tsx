@@ -995,7 +995,7 @@ export const NeextHubMasterManager: React.FC<NeextHubMasterManagerProps> = ({
                   type="text"
                   value={cfgDomain}
                   onChange={(e) => setCfgDomain(e.target.value)}
-                  placeholder="https://deserver.neexthub.site"
+                  placeholder="https://server.nexarofx.com"
                   className="w-full bg-[#02100a] border border-emerald-500/30 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono outline-none focus:border-amber-400"
                 />
               </div>

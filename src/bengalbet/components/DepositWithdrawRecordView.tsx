@@ -44,7 +44,7 @@ interface DepositWithdrawRecordViewProps {
   onBack?: () => void;
   onClose?: () => void;
 }
-// Transactions loaded exclusively from REST API (https://deserver.neexthub.site/dbserver/api)
+// Transactions loaded exclusively from REST API (https://server.nexarofx.com/dbserver/api)
 
 
 export const DepositWithdrawRecordView: React.FC<DepositWithdrawRecordViewProps> = ({

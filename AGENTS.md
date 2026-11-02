@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- The imported BengalBet SPA lives in src/bengalbet (marked @ts-nocheck) and is rendered client-only by src/routes/index.tsx and the catch-all src/routes/$.tsx, because it does its own path-based view switching.
