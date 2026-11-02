@@ -70,6 +70,8 @@ import { NeextHubAdminReferralsManager } from './NeextHubAdminReferralsManager';
 import { NeextHubAdminVipManager } from './NeextHubAdminVipManager';
 import { NeextHubAdminRewardsManager } from './NeextHubAdminRewardsManager';
 import { NeextHubMasterManager } from './NeextHubMasterManager';
+import { AdminSiteContent } from './AdminSiteContent';
+import { saveVerifiedSettings } from '../services/settingsPersistence';
 
 interface NeextHubAdminViewProps {
   language: Language;
@@ -94,6 +96,9 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
   // Active Tab & Responsive Sidebar State
   const [activeTab, setActiveTab] = useState<AdminTab>('overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [settingsReady, setSettingsReady] = useState(false);
+  const [settingsSaveError, setSettingsSaveError] = useState<string | null>(null);
+  const [settingsSaved, setSettingsSaved] = useState(false);
 
   // Data States
   const [isLoading, setIsLoading] = useState(false);
@@ -230,6 +235,7 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
       if (txRes.success && txRes.transactions) {
         setTransactions(txRes.transactions);
       }
+      setSettingsReady(settingsRes.success && !!settingsRes.settings?.siteNotice);
       if (settingsRes.success && settingsRes.settings) {
         setSettings(prev => ({ ...prev, ...settingsRes.settings }));
       }
@@ -336,6 +342,22 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
 
     return { total, active, frozen, banned, totalBalance, highVipCount };
   }, [users]);
+
+  const adminTabs = [
+            { id: 'overview', label: 'ওভারভিউ', icon: LayoutDashboard },
+            { id: 'users', label: 'প্লেয়ার ও ব্যালেন্স', icon: Users, badge: users.length },
+            { id: 'vip', label: 'ভিআইপি ক্লাব', icon: Crown },
+            { id: 'rewards_manager', label: 'পুরস্কার ও প্রচার', icon: Gift },
+            { id: 'transactions', label: 'ট্রানজেকশন প্রসেসিং', icon: CreditCard, badge: stats.pendingDepositsCount + stats.pendingWithdrawalsCount },
+            { id: 'games', label: 'গেম ইঞ্জিন ও RTP', icon: Gamepad2 },
+            { id: 'gateways', label: 'বিকাশ/নগদ গেটওয়ে', icon: Wallet },
+            { id: 'promotions', label: 'সাইটের নোটিশ', icon: Bell },
+            { id: 'messages', label: 'অভ্যন্তরীণ বার্তা', icon: Mail },
+            { id: 'support', label: 'সাপোর্ট টিকিট', icon: MessageSquare, badge: stats.pendingFeedbacksCount },
+            { id: 'livechat', label: 'লাইভ চ্যাট কনসোল', icon: Headphones, badge: liveChatBadge },
+            { id: 'referrals', label: 'রেফারেল ও এজেন্ট', icon: Share2 },
+            { id: 'master_api', label: 'ডাটাবেস ও ফাইল কন্ট্রোলার', icon: Server }
+          ];
 
   // ====================================================
   // USER ACTION HANDLERS
@@ -598,14 +620,17 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
 
   // Save Settings
   const handleSaveSettings = async () => {
+    if (!settingsReady || isLoading) return;
     setIsLoading(true);
+    setSettingsSaved(false);
+    setSettingsSaveError(null);
     try {
-      const res = await api.admin.updateSettings(settings);
-      if (res.success) {
-        showToast('সাইট কনফিগারেশন সফলভাবে সেভ হয়েছে!');
-      }
+      const verified = await saveVerifiedSettings(settings, api.admin);
+      setSettings(prev => ({ ...prev, ...verified }));
+      setSettingsSaved(true);
+      showToast('সার্ভারের সেটিংস সংরক্ষণ নিশ্চিত হয়েছে!');
     } catch (e: any) {
-      alert(e.message);
+      setSettingsSaveError(e.message || 'সংরক্ষণ যাচাই করা যায়নি।');
     } finally {
       setIsLoading(false);
     }
@@ -805,21 +830,7 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
               </div>
 
               <div className="space-y-1">
-                {[
-                  { id: 'overview', label: 'ওভারভিউ (Overview)', icon: LayoutDashboard },
-                  { id: 'users', label: 'ইউজার ও ব্যালেন্স (Users & Balance)', icon: Users, badge: users.length },
-                  { id: 'vip', label: 'ভিআইপি ক্লাব নিয়ন্ত্রণ (VIP Club)', icon: Crown },
-                  { id: 'rewards_manager', label: 'পুরস্কার ও প্রচার কন্ট্রোল (Rewards & CRUD)', icon: Gift },
-                  { id: 'transactions', label: 'ডিপোজিট ও উইথড্রল (Transactions)', icon: CreditCard, badge: stats.pendingDepositsCount + stats.pendingWithdrawalsCount },
-                  { id: 'games', label: 'গেম ইঞ্জিন ও RTP (Game Control)', icon: Gamepad2 },
-                  { id: 'gateways', label: 'গেটওয়ে ও নম্বর (Payment Gateways)', icon: Wallet },
-                  { id: 'promotions', label: 'নোটিশ ও প্রচার (Promotions)', icon: Bell },
-                  { id: 'messages', label: 'অভ্যন্তরীণ বার্তা (Internal Messages)', icon: Mail },
-                  { id: 'support', label: 'সাপোর্ট টিকিট (Support)', icon: MessageSquare, badge: stats.pendingFeedbacksCount },
-                  { id: 'livechat', label: 'লাইভ চ্যাট কনসোল (Live Chat)', icon: Headphones, badge: liveChatBadge },
-                  { id: 'referrals', label: 'রেফারেল ও এজেন্ট নেটওয়ার্ক (Referrals)', icon: Share2 },
-                  { id: 'master_api', label: 'ডাটাবেস ও ফাইল কন্ট্রোলার (Master API & DB)', icon: Server }
-                ].map(tab => {
+                {adminTabs.map(tab => {
                   const Icon = tab.icon;
                   const isActive = activeTab === tab.id;
                   return (
@@ -864,21 +875,7 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
       {/* DESKTOP TAB NAVIGATION BAR */}
       <nav className="bg-[#061e14] border-b border-emerald-800/40 px-3 sm:px-6 hidden lg:block">
         <div className="max-w-7xl mx-auto flex items-center gap-1 overflow-x-auto py-2">
-          {[
-            { id: 'overview', label: 'ওভারভিউ', icon: LayoutDashboard },
-            { id: 'users', label: 'প্লেয়ার ও ব্যালেন্স', icon: Users, badge: users.length },
-            { id: 'vip', label: 'ভিআইপি ক্লাব', icon: Crown },
-            { id: 'rewards_manager', label: 'পুরস্কার ও প্রচার', icon: Gift },
-            { id: 'transactions', label: 'ট্রানজেকশন প্রসেসিং', icon: CreditCard, badge: stats.pendingDepositsCount + stats.pendingWithdrawalsCount },
-            { id: 'games', label: 'গেম ইঞ্জিন ও RTP', icon: Gamepad2 },
-            { id: 'gateways', label: 'বিকাশ/নগদ গেটওয়ে', icon: Wallet },
-            { id: 'promotions', label: 'ব্যানার ও বোনাস', icon: Bell },
-            { id: 'messages', label: 'অভ্যন্তরীণ বার্তা', icon: Mail },
-            { id: 'support', label: 'সাপোর্ট টিকিট', icon: MessageSquare, badge: stats.pendingFeedbacksCount },
-            { id: 'livechat', label: 'লাইভ চ্যাট কনসোল', icon: Headphones, badge: liveChatBadge },
-            { id: 'referrals', label: 'রেফারেল ও এজেন্ট', icon: Share2 },
-            { id: 'master_api', label: 'ডাটাবেস ও ফাইল কন্ট্রোলার', icon: Server }
-          ].map(tab => {
+          {adminTabs.map(tab => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
@@ -909,21 +906,7 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
 
       {/* MOBILE HORIZONTAL CHIP TABS */}
       <div className="lg:hidden bg-[#061e14] border-b border-emerald-800/40 px-3 py-2 overflow-x-auto flex items-center gap-1.5 scrollbar-none">
-        {[
-          { id: 'overview', label: 'ওভারভিউ', icon: LayoutDashboard },
-          { id: 'users', label: 'ইউজারস', icon: Users, badge: users.length },
-          { id: 'vip', label: 'VIP ক্লাব', icon: Crown },
-          { id: 'rewards_manager', label: 'পুরস্কার ও প্রচার', icon: Gift },
-          { id: 'transactions', label: 'লেনদেন', icon: CreditCard, badge: stats.pendingDepositsCount + stats.pendingWithdrawalsCount },
-          { id: 'games', label: 'RTP কন্ট্রোল', icon: Gamepad2 },
-          { id: 'gateways', label: 'গেটওয়ে', icon: Wallet },
-          { id: 'promotions', label: 'নোটিশ', icon: Bell },
-          { id: 'messages', label: 'বার্তা', icon: Mail },
-          { id: 'support', label: 'সাপোর্ট', icon: MessageSquare, badge: stats.pendingFeedbacksCount },
-          { id: 'livechat', label: 'লাইভ চ্যাট', icon: Headphones, badge: liveChatBadge },
-          { id: 'referrals', label: 'রেফারেল', icon: Share2 },
-          { id: 'master_api', label: 'ডাটাবেস/ফাইল', icon: Server }
-        ].map(tab => {
+        {adminTabs.map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
@@ -1904,85 +1887,15 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
         {/* TAB 6: PROMOTIONS & NOTICE MODAL                    */}
         {/* ==================================================== */}
         {activeTab === 'promotions' && (
-          <div className="space-y-4">
-            <div className="p-4 rounded-2xl bg-[#09291b] border border-emerald-700/40">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Bell className="w-5 h-5 text-yellow-400" />
-                নোটিশ ব্যানার ও বোনাস ক্যাম্পেইন কন্ট্রোল
-              </h3>
-              <p className="text-xs text-emerald-300/80">
-                ওয়েবসাইটে ঢোকার সময় যে অফিশিয়াল নোটিশ পপআপ হয় তা এখান থেকে সরাসরি এডিট বা বন্ধ করতে পারবেন।
-              </p>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-[#09291b] border border-emerald-700/40 space-y-4">
-              <div className="flex items-center justify-between p-3 rounded-xl bg-[#051e14] border border-emerald-800">
-                <div>
-                  <div className="font-bold text-sm text-white">পপ-আপ নোটিশ প্রদর্শন</div>
-                  <div className="text-xs text-gray-400">নতুন ভিজিটরে নোটিশ পপআপ হবে কিনা</div>
-                </div>
-                <input
-                  type="checkbox"
-                  checked={settings.siteNotice.enabled}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    siteNotice: { ...settings.siteNotice, enabled: e.target.checked }
-                  })}
-                  className="w-5 h-5 accent-yellow-400 rounded cursor-pointer"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">নোটিশ শিরোনাম (বাংলা):</label>
-                <input
-                  type="text"
-                  value={settings.siteNotice.titleBn}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    siteNotice: { ...settings.siteNotice, titleBn: e.target.value }
-                  })}
-                  className="w-full bg-[#051c13] border border-emerald-700 rounded-xl px-3.5 py-2.5 text-xs text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">নোটিশ বিস্তারিত বিবরণ (বাংলা):</label>
-                <textarea
-                  rows={3}
-                  value={settings.siteNotice.contentBn}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    siteNotice: { ...settings.siteNotice, contentBn: e.target.value }
-                  })}
-                  className="w-full bg-[#051c13] border border-emerald-700 rounded-xl px-3.5 py-2.5 text-xs text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-gray-300 mb-1">ব্যানার ছবির লিংক (Image URL):</label>
-                <input
-                  type="text"
-                  value={settings.siteNotice.bannerImage}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    siteNotice: { ...settings.siteNotice, bannerImage: e.target.value }
-                  })}
-                  className="w-full bg-[#051c13] border border-emerald-700 rounded-xl px-3.5 py-2.5 text-xs text-white font-mono"
-                />
-              </div>
-
-              <div className="flex justify-end pt-2">
-                <button
-                  type="button"
-                  onClick={handleSaveSettings}
-                  className="px-6 py-3 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-black font-black text-xs shadow-lg shadow-yellow-500/20 flex items-center gap-2 cursor-pointer"
-                >
-                  <Save className="w-4 h-4" />
-                  নোটিশ সেভ করুন
-                </button>
-              </div>
-            </div>
-          </div>
+          <AdminSiteContent
+            notice={settings.siteNotice}
+            onChange={siteNotice => { setSettings(prev => ({ ...prev, siteNotice })); setSettingsSaved(false); setSettingsSaveError(null); }}
+            onSave={handleSaveSettings}
+            busy={isLoading}
+            ready={settingsReady}
+            error={settingsSaveError}
+            saved={settingsSaved}
+          />
         )}
 
         {/* ==================================================== */}
