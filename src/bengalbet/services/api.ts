@@ -29,6 +29,13 @@ const getInitialConfig = () => {
 
 const _configState = getInitialConfig();
 
+// Old sessions (before signed tokens) must sign in again
+try {
+  if (localStorage.getItem('bengalbet_user_session') && !localStorage.getItem('bengalbet_auth_token')) {
+    localStorage.removeItem('bengalbet_user_session');
+  }
+} catch {}
+
 const persistConfig = () => {
   try {
     localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify({
