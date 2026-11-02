@@ -35,6 +35,7 @@ import { UserAccount, RescueTierRecord, PromoCodeRecord, UserTicketRecord } from
 import { api } from '../services/api';
 import { refreshSettledReward } from '../services/settledReward';
 import { mayClaimMemberTask } from '../services/memberTaskState';
+import { memberTaskLabel } from '../services/memberTaskConfig';
 import { MysteryRewardModal } from './MysteryRewardModal';
 
 interface RewardCenterViewProps {
@@ -570,20 +571,7 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
     } finally { setSigninBusy(false); }
   };
 
-  const signin12DaysData = [
-    { day: 1, icon: '🧧', bonus: 10, task: 'প্রতিদিন লগইন করুন' },
-    { day: 2, icon: '🎁', bonus: 20, task: '১০০ টাকা বাজি ধরুন' },
-    { day: 3, icon: '💎', bonus: 30, task: '২০০ টাকা জমা করুন' },
-    { day: 4, icon: '🪙', bonus: 50, task: '৩০০ টাকা বাজি ধরুন' },
-    { day: 5, icon: '👑', bonus: 80, task: '৫০০ টাকা বাজি ধরুন' },
-    { day: 6, icon: '💰', bonus: 100, task: '১,০০০ টাকা জমা করুন' },
-    { day: 7, icon: '🎲', bonus: 150, task: '১,৫০০ টাকা বাজি ধরুন' },
-    { day: 8, icon: '🏆', bonus: 200, task: '২,০০০ টাকা বাজি ধরুন' },
-    { day: 9, icon: '🌟', bonus: 300, task: '৩,০০০ টাকা জমা করুন' },
-    { day: 10, icon: '🎫', bonus: 500, task: '৫,০০০ টাকা বাজি ধরুন' },
-    { day: 11, icon: '📦', bonus: 800, task: '৮,০০০ টাকা বাজি ধরুন' },
-    { day: 12, icon: '🎯', bonus: 1200, task: '১০,০০০ টাকা বাজি ধরুন' },
-  ];
+  const signin12DaysData = memberTasks.map(task => ({ ...task, icon: task.requirementType === 'deposit' ? '💰' : task.requirementType === 'bet' ? '🎲' : '🧧', task: memberTaskLabel(task) }));
 
   const signin30DaysData = signinDaysData;
 
