@@ -234,7 +234,7 @@ export const NeextHubAdminReferralsManager: React.FC<NeextHubAdminReferralsManag
         api.admin.referrals.getStats(),
         api.admin.referrals.getList(searchQuery, statusFilter),
         api.admin.referrals.getSettings(),
-        api.admin.referrals.getClaims().catch(() => ({ success: false, claims: [] }))
+        api.admin.referrals.getClaims()
       ]);
 
       if (statsRes.success) {

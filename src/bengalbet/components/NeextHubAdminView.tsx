@@ -913,6 +913,7 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
           { id: 'overview', label: 'ওভারভিউ', icon: LayoutDashboard },
           { id: 'users', label: 'ইউজারস', icon: Users, badge: users.length },
           { id: 'vip', label: 'VIP ক্লাব', icon: Crown },
+          { id: 'rewards_manager', label: 'পুরস্কার ও প্রচার', icon: Gift },
           { id: 'transactions', label: 'লেনদেন', icon: CreditCard, badge: stats.pendingDepositsCount + stats.pendingWithdrawalsCount },
           { id: 'games', label: 'RTP কন্ট্রোল', icon: Gamepad2 },
           { id: 'gateways', label: 'গেটওয়ে', icon: Wallet },

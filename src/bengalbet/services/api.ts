@@ -6,6 +6,7 @@
 
 import { UserAccount } from '../types';
 import { normalizeServerConfig } from './apiConfig';
+import { mayAttachAdminCredential, mayAttachMemberCredential } from './requestPolicy';
 
 const STORAGE_KEY_CONFIG = 'bengalbet_rest_api_config';
 
@@ -173,8 +174,8 @@ const request = async <T = any>(endpoint: string, options: RequestInit = {}): Pr
   const targetUrl = buildApiUrl(endpoint);
   const headers = {
     'Content-Type': 'application/json',
-    ...(getAuthToken() ? { 'Authorization': getAuthToken() } : {}),
-    ...(REST_API_CONFIG.masterKey ? { 'X-Master-Key': REST_API_CONFIG.masterKey } : {}),
+    ...(mayAttachMemberCredential(endpoint) && getAuthToken() ? { 'Authorization': getAuthToken() } : {}),
+    ...(mayAttachAdminCredential(endpoint, options.method) && REST_API_CONFIG.masterKey ? { 'X-Master-Key': REST_API_CONFIG.masterKey } : {}),
     ...(options.headers || {})
   };
 

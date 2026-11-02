@@ -4,10 +4,10 @@ import { BengalBetShell } from "@/components/BengalBetShell";
 export const Route = createFileRoute("/$")({
   head: () => ({
     meta: [
-      { title: "BengalBet - Online Gaming Portal" },
-      { name: "description", content: "BengalBet games lobby, promotions, lucky spin and VIP rewards." },
-      { property: "og:title", content: "BengalBet - Online Gaming Portal" },
-      { property: "og:description", content: "BengalBet games lobby, promotions, lucky spin and VIP rewards." },
+      { title: "BengalBet - Member and Administration Pages" },
+      { name: "description", content: "BengalBet member account, game views and authorized administration." },
+      { property: "og:title", content: "BengalBet - Member and Administration Pages" },
+      { property: "og:description", content: "BengalBet member account, game views and authorized administration." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
