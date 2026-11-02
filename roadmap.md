@@ -1,12 +1,13 @@
 # Remaining work
 
 Latest implementation request (2026-11-02 05:33 UTC): execute the report, improve admin settings/navigation, verify timed rewards, and simulate 30–60 days with 100 referred and 100 non-referred joins daily. Simulation must use an isolated clock/data environment, not thousands of production accounts; no unattended month-long monitoring is established by a chat turn.
-- [ ] Restore the secure server connection and verify live read access.
-- [ ] Improve admin navigation to existing settings without changing financial rules or inventing settings endpoints.
-- [ ] Implement and test safe date-based reward eligibility against actual API contracts.
-- [ ] Run deterministic 30/60-day cohort checks; report exactly what they prove and do not prove.
-- [ ] Verify changed browser flows and record remaining production release blockers.
+- [x] Restored BengalBet Server connection; live ping and file inventory HTTP 200; current mystery PHP read succeeded.
+- [x] Shared admin navigation; notice editor now has bilingual fields, enabled switch, image preview, explicit failure/loading feedback and save/readback verification. Real authenticated desktop/mobile reads succeeded; no settings were changed.
+- [x] Mystery claim affordance now requires server-confirmed event day/opening time as well as eligibility/unlocked/unclaimed state; no browser-clock eligibility inference.
+- [x] Deterministic 30/60-day local member-UI simulations: 6,000/12,000 synthetic users, half referred/half direct; 93,000/366,000 member-day checks, four eligibility decisions each. This is NOT live registration, referral commission, ledger, payout, server-clock or month-long uptime testing.
+- [x] 17 tests passed; authenticated notice loaded in desktop/mobile browser, bilingual switch worked, zero page errors and mobile horizontal overflow absent; latest preview build OK. Save persistence tested with isolated function doubles, NOT a production settings mutation.
 - [ ] Blocked: production financial/auth updates and full settlement tests require a verified protected restorable backup, isolated staging DBServer/funds, and scoped administrator identity; long-running monitoring also requires a provisioned scheduled service.
+- Current live recheck: all five reward-admin sections still return 404. No PHP upload or publish performed. Remaining full-plan scope (wallet/game settlement, other promotions, content/banner program CRUD, legal/safety controls, authenticated member flows) is not complete and awaits the same verified isolation/access prerequisites.
 
 - [x] Follow-up (2026-11-02 05:22 UTC): verified legacy admin login and users/settings/stats/feedbacks/transactions reads (HTTP 200); no credential in report/project files and no writes. VIP/Rewards/Referrals subtab checks remain unverified; login does not establish scoped admin or connector access.
 
