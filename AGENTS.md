@@ -14,3 +14,5 @@
 - The root environment configuration may set the public default API URL; browser-local admin settings override that default, and reset restores it. Environment changes require a new deployment to affect the published app.
 - Keep credential forwarding decisions in requestPolicy and test member/admin boundaries; legacy browser admin access is transitional and must not be expanded into demo bypasses or unrestricted proxies.
 - Keep member mystery-claim eligibility in rewardEligibility and fail closed on missing server data; client checks prevent accidental claims but do not replace authoritative server validation.
+- Keep notice editing in AdminSiteContent and confirm saves through settingsPersistence readback; a successful write response alone does not establish persisted member-visible settings.
+- Derive all administrator navigation surfaces from one tab list to preserve access and consistent labels.
