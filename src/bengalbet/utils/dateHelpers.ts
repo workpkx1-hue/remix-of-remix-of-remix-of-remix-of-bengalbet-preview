@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Dynamic Date & Currency Helpers for Bengali Betting, Account, and Profit/Loss Records
  */

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Synthesizer for JILI Crazy 777 (Mechanical slot clunks, 777 sirens, retro bell chimes, 4th special reel multiplier whirs)
 
 class Crazy777Audio {

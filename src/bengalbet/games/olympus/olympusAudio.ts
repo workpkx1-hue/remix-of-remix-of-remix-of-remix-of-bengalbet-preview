@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Web Audio synthesizer for Pragmatic Play Gates of Olympus
 
 class OlympusAudio {

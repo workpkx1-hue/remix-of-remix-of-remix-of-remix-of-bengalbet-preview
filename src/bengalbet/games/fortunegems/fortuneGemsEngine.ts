@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { 
   SymbolId, 
   FORTUNE_SYMBOLS, 

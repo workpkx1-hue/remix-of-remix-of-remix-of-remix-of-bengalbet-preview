@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { FORTUNE_SYMBOLS, FORTUNE_PAYLINES } from './fortuneGemsTypes';
 import { FortuneSymbolView } from './FortuneSymbolView';

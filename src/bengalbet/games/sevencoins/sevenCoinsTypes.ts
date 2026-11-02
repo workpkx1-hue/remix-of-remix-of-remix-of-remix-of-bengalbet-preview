@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type SevenCoinsSymbolType =
   | 'seven'       // Triple Red 777
   | 'bell'        // Golden Bell

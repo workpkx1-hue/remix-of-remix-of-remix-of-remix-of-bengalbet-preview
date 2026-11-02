@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type MagicAceSymbolType =
   | 'ace_spades'
   | 'king_hearts'

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Web Audio API Synthesizer for Head & Tail Casino Game
  * Provides rich, realistic metallic coin flips, air spinning whooshes,

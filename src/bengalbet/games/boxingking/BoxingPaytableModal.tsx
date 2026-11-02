@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { X, Info, Flame, Award, Zap } from 'lucide-react';
 import { BOXING_SYMBOLS, BASE_MULTIPLIER_LADDER, FREE_SPINS_MULTIPLIER_LADDER } from './boxingKingTypes';

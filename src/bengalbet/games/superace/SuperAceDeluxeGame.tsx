@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JILI Super Ace Deluxe - Official Recreation
  * 

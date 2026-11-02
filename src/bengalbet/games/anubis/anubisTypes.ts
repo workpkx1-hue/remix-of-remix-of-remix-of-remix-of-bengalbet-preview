@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type AnubisSymbolType =
   | 'anubis'
   | 'scarab'

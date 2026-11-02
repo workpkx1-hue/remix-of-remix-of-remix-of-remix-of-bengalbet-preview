@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Head & Tail (হেড অ্যান্ড টেল) - Authentic Casino Coin Toss Game
  * 

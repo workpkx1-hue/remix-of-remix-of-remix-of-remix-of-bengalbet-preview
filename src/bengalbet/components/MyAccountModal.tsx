@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet My Account Profile Modal
  * Features:

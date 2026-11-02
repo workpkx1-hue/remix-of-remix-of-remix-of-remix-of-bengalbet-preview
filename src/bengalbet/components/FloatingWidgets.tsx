@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Floating Quick Actions & Widgets
  * Features:

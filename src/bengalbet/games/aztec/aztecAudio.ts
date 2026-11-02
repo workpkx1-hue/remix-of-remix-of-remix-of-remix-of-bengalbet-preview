@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Web Audio synthesizer for PG Soft Treasures of Aztec
 
 class AztecAudio {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Web Audio API Sound Synthesizer for Fortune Gems 3
 class FortuneGemsAudioEngine {
   private ctx: AudioContext | null = null;

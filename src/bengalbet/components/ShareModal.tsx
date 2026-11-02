@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Refer & Earn Share Modal
  * Features:

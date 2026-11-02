@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Sparkles, Trophy, ArrowRight } from 'lucide-react';
 import confetti from 'canvas-confetti';

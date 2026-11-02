@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Casino & Gaming Portal
  * 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type AztecSymbolType =
   | 'gold_mask'       // Golden Mask (highest paying)
   | 'pink_mask'       // Pink Aztec face

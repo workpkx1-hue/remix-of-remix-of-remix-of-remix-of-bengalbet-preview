@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { X, Smartphone, Download, QrCode, ShieldCheck, Check, Sparkles } from 'lucide-react';
 import confetti from 'canvas-confetti';

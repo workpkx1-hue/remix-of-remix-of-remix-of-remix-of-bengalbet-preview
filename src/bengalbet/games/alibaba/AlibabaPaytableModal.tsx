@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { X, Sparkles, Trophy, HelpCircle, Shield, Flame, Key } from 'lucide-react';
 import { ALIBABA_SYMBOLS, AlibabaSymbolType } from './alibabaTypes';

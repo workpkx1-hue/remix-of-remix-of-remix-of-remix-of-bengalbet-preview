@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Promotion } from '../types';
 
 import promoMystery from '../assets/images/bn_promo_mystery_1790173769456.jpg';

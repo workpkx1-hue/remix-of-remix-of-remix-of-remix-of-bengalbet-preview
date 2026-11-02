@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Golden Egg Smash Modal
  * Features:

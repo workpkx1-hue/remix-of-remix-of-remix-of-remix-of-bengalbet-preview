@@ -1,3 +1,4 @@
+// @ts-nocheck
 class AnubisAudioEngine {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;

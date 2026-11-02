@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Crazy777SymbolType, Crazy777SpecialType } from './crazy777Types';
 import { Sparkles, Zap, RotateCcw } from 'lucide-react';

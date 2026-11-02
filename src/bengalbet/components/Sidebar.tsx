@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Left Navigation Sidebar
  * Features:

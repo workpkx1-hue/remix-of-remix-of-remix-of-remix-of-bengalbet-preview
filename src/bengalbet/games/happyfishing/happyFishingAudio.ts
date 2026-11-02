@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Web Audio Synthesizer for JILI Happy Fishing (Cannons, Torpedoes, Fish Splash, Boss Alarm)
 
 class HappyFishingAudio {

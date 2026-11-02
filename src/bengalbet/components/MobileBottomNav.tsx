@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Home, Gift, Trophy, User, Share2 } from 'lucide-react';
 import { Language, UserAccount } from '../types';

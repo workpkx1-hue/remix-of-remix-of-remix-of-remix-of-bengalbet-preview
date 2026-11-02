@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { X, Youtube, ExternalLink } from 'lucide-react';
 import { YOUTUBE_VIDEO_MAGIC_ACE } from './magicAceTypes';

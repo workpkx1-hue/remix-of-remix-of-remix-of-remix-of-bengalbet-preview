@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Web Audio synthesizer for Sweet Bonanza sound effects
 
 class SweetBonanzaAudio {

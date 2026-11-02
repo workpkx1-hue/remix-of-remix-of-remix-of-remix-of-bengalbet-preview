@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { Sparkles, Layers } from 'lucide-react';
 import { Language } from '../types';

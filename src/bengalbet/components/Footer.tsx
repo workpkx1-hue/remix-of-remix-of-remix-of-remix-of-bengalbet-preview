@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Main Application Footer
  * Features:

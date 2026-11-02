@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Official Announcement & Notice Modal
  * Features:

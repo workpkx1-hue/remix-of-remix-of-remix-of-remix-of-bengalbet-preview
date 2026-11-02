@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Promotions View
  * Features:

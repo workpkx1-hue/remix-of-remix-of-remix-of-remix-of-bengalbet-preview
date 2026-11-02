@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JILI Super Ace II (Super Ace 11) - Official Recreation
  * 

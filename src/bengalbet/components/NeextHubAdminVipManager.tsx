@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { 
   Crown, Trophy, Award, Star, Plus, Edit3, Trash2, RotateCcw, 

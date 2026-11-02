@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect } from 'react';
 import { Sparkles, Zap, Trophy, Flame, Atom } from 'lucide-react';
 

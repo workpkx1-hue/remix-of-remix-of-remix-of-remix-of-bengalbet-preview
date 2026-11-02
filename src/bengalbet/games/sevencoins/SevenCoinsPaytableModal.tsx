@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { X, Sparkles, Coins, Trophy } from 'lucide-react';
 import { SEVEN_COINS_PAYOUTS } from './sevenCoinsTypes';

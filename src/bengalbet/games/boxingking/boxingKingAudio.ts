@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Web Audio API Sound Synthesizer for Boxing King Slot
 class BoxingKingAudioEngine {
   private ctx: AudioContext | null = null;

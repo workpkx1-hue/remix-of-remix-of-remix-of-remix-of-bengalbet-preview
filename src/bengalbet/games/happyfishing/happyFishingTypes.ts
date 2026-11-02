@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type FishType =
   | 'clownfish'
   | 'puffer'

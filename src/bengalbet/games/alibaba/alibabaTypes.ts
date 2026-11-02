@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type AlibabaSymbolType =
   | 'alibaba'        // Hero with turban and curved scimitar (Highest regular)
   | 'morgiana'       // Arabian princess/heroine

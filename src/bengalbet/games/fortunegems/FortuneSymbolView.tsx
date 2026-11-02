@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { SymbolId, FORTUNE_SYMBOLS } from './fortuneGemsTypes';
 

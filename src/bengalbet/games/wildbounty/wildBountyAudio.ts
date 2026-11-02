@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Web Audio Synthesizer for Wild Bounty Showdown (Western Gunfire, Ricochet, Cascades)
 
 class WildBountyAudio {

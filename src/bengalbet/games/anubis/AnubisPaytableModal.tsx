@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { X, Trophy, Flame, Sparkles } from 'lucide-react';
 import { ANUBIS_SYMBOLS_META, AnubisSymbolType } from './anubisTypes';

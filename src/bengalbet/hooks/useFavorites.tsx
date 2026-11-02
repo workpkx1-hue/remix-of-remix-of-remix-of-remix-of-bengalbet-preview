@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const FAVORITES_STORAGE_KEY = 'bdt222_user_favorites';

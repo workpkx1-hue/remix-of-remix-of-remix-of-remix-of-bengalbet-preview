@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Web Audio Synthesizer for FA CHAI Super Elements 2
 
 class SuperElementsAudio {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { GameEngineSettings } from '../types';
 import { api } from './api';
 

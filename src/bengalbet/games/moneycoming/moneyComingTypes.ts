@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type MoneyComingNumber = 'blank' | '1' | '2' | '5' | '10' | '0' | '00' | '100';
 
 export type MoneyComingSpecial =

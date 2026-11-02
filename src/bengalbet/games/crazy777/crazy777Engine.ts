@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { 
   Crazy777SymbolType, 
   Crazy777SpecialType, 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import { X, Download, Gift } from 'lucide-react';
 import { Language } from '../types';

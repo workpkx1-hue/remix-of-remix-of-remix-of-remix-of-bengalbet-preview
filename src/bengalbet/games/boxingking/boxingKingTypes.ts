@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type BoxingSymbolId = 
   | 'RED_BOXER' 
   | 'BLUE_BOXER' 

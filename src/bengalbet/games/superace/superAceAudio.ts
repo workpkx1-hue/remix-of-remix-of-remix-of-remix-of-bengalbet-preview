@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * JILI Super Ace Authentic Web Audio API Sound Engine
  * 

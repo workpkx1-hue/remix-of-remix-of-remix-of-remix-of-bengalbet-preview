@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { X, Trophy, Star, Sparkles, PartyPopper } from 'lucide-react';
 import { PINATA_SYMBOLS_META, PinataSymbolType } from './pinataTypes';

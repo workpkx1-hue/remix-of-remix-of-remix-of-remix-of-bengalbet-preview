@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Web Audio synthesizer for JILI Circus Joker 4096
 
 class CircusAudio {

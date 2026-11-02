@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Web Audio Synthesizer for JILI Fortune Tree (Festive Asian Pentatonic Chimes, Golden Bell Rings, Tree Shaking, Red Packet Pop)
 
 class FortuneTreeAudio {

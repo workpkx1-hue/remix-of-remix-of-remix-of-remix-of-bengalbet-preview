@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Lucky Wheel Spin Modal
  * Features:

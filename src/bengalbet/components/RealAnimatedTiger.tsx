@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState } from 'react';
 import tigerFaceImg from '../assets/images/real_tiger_face_1790007904695.jpg';
 

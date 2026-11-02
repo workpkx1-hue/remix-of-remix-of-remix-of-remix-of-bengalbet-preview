@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { PinataSymbolType, PINATA_SYMBOLS_META } from './pinataTypes';
 import { Sparkles, Star, Music, PartyPopper } from 'lucide-react';

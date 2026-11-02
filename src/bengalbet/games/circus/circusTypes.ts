@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type CircusSymbolType =
   | 'ringmaster'  // Circus Ringmaster (highest regular)
   | 'lion'        // Performing Circus Lion

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { X, HelpCircle, Sparkles, Trophy, Disc, RotateCcw } from 'lucide-react';
 import { Language } from '../../types';

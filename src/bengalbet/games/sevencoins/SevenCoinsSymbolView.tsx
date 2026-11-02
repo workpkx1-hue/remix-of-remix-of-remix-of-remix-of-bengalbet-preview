@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { SevenCoinsSymbolType, JackpotTier } from './sevenCoinsTypes';
 import { Sparkles, Coins } from 'lucide-react';

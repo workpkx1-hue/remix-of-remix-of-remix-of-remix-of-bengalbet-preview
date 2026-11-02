@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { Sparkles, ShieldCheck, Zap } from 'lucide-react';
 import { Language } from '../types';

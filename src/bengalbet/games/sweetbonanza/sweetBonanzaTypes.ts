@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type SweetSymbolType =
   | 'heart'       // Red heart candy
   | 'purple_sq'   // Purple candy

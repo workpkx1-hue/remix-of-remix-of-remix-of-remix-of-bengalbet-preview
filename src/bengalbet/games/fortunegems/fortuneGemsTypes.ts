@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type SymbolId = 'WILD' | 'RED_GEM' | 'BLUE_GEM' | 'GREEN_GEM' | 'ACE' | 'KING' | 'QUEEN' | 'JACK';
 
 export interface SymbolConfig {

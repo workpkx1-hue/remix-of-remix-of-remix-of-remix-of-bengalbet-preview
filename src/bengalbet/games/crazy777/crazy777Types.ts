@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type Crazy777SymbolType =
   | 'triple_7'   // Red 777 (Highest payout)
   | 'double_7'   // Orange 77

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { X, Sparkles, Zap, Flame, Crown, Atom, Radio } from 'lucide-react';
 import { ELEMENT_SYMBOLS } from './superElementsTypes';

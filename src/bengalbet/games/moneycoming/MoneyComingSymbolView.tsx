@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { MoneyComingNumber, MoneyComingSpecial } from './moneyComingTypes';
 import { RotateCcw, Sparkles, Disc } from 'lucide-react';

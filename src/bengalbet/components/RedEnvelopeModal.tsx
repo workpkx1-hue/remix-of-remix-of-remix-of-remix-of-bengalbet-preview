@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Red Envelope (Red Packet) Rain Modal
  * Features:

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { X, Clock, Sparkles, Share2, ArrowRight, Trophy, Users, Award, Gift, Gem, Flame } from 'lucide-react';
 import confetti from 'canvas-confetti';

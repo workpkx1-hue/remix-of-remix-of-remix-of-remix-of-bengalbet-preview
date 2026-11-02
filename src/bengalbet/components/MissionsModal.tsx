@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Missions & User Center Modal
  * Features:

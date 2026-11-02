@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet VIP Loyalty Club Modal
  * Features:

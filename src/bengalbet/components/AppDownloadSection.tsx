@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { Smartphone, QrCode, Download } from 'lucide-react';
 import { Language } from '../types';

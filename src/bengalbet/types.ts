@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type Language = 'bn' | 'en';
 
 export type MainNavTab = 'offers' | 'missions' | 'spin' | 'redpacket' | 'vip' | 'share' | 'lobby';

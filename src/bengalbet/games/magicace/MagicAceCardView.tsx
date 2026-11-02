@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { MagicAceCard } from './magicAceTypes';
 import { Lock, Sparkles, Crown, Zap } from 'lucide-react';

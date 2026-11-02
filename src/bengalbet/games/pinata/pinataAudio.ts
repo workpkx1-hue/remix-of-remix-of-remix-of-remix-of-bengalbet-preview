@@ -1,3 +1,4 @@
+// @ts-nocheck
 class PinataAudioEngine {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;

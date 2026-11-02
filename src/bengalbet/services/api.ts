@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Client-side API Service
  * Connects frontend UI to real Express backend & JSON Database

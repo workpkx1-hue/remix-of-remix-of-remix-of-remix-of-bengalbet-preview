@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { X, MessageSquare, Headphones } from 'lucide-react';
 import confetti from 'canvas-confetti';

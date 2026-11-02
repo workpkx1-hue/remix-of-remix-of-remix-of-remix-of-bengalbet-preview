@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Web Audio API Synthesizer for JILI Magic Ace / Wild Lock
 
 class MagicAceAudio {

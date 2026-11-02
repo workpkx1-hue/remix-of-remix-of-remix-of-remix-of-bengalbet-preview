@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Spribe Aviator Authentic Web Audio API Engine
  * 

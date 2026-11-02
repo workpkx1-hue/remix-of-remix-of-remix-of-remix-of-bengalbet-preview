@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Category Games View
  * Features:

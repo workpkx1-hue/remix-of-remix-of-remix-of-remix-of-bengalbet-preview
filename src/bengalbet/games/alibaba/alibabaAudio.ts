@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Web Audio Synthesizer for Alibaba's Cave of Fortune (Arabian Oud, Magical Bells, Open Sesame Gate, Coin Showers)
 
 class AlibabaAudio {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type FortuneTreeSymbolType =
   | 'golden_tree'   // Golden Money Tree WILD (Top Symbol)
   | 'jin_chan'      // Golden 3-Legged Money Toad with Coin

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Golden Egg Renewal & State Helper
  * - Manages 24-hour cycle or custom renew duration

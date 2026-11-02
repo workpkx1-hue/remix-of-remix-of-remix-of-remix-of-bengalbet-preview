@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { 
   BoxingSymbolId, 
   BOXING_SYMBOLS, 

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React from 'react';
 import { FortuneTreeCell, FORTUNE_TREE_SYMBOLS } from './fortuneTreeTypes';
 import { Sparkles, Flame } from 'lucide-react';

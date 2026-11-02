@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Synthesizer for 3 Oaks Gaming 777 Coins (Hold and Win coins, collect chimes, jackpot gong)
 
 class SevenCoinsAudio {

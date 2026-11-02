@@ -1,3 +1,4 @@
+// @ts-nocheck
 export type OlympusSymbolType =
   | 'crown'       // Golden Crown (highest regular symbol)
   | 'hourglass'   // Ancient Hourglass

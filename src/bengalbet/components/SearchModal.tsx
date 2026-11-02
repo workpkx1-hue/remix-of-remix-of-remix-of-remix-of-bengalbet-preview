@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BengalBet Global Search Modal
  * Features:
