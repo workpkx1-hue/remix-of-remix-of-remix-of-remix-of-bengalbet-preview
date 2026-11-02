@@ -33,6 +33,7 @@ import {
 import confetti from 'canvas-confetti';
 import { UserAccount, RescueTierRecord, PromoCodeRecord, UserTicketRecord } from '../types';
 import { api } from '../services/api';
+import { refreshSettledReward } from '../services/settledReward';
 import { MysteryRewardModal } from './MysteryRewardModal';
 
 interface RewardCenterViewProps {
@@ -565,7 +566,7 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
       setSigninEligible(false);
       setSignedDays(prev => Array.from(new Set([...prev, res.dayNumber])));
       setSigninStreak(res.streak);
-      if (onSettledReward) onSettledReward();
+      await refreshSettledReward(res, onSettledReward);
       await loadRewardBackendData();
       confetti({ particleCount: 65, spread: 70, origin: { y: 0.5 } });
     } catch (e: any) {
@@ -603,9 +604,7 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
       const res = await api.promos.redeem(code);
       if (res && res.success) {
         setPromoFeedback(`অভিনন্দন! কোড "${code}" সফলভাবে রিডিম হয়েছে। ৳ ${res.bonusAmount.toFixed(2)} বোনাস আপনার অ্যাকাউন্টে যোগ হয়েছে।`);
-        if (onClaimSuccess) {
-          onClaimSuccess(res.bonusAmount, `প্রচার কোড (${code}) বোনাস (+৳${res.bonusAmount.toFixed(2)})`);
-        }
+        await refreshSettledReward(res, onSettledReward);
         confetti({
           particleCount: 60,
           spread: 65,
@@ -631,9 +630,7 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
       if (res && res.success) {
         setRescueClaimed(true);
         setRescueFeedback(`অভিনন্দন! ৳ ${res.claim.bonusAmount.toFixed(2)} উদ্ধার তহবিল সফলভাবে আপনার ব্যালেন্সে যোগ হয়েছে।`);
-        if (onClaimSuccess) {
-          onClaimSuccess(res.claim.bonusAmount, `দৈনিক উদ্ধার তহবিল সহায়তা (+৳${res.claim.bonusAmount.toFixed(2)})`);
-        }
+        await refreshSettledReward(res, onSettledReward);
         confetti({
           particleCount: 60,
           spread: 65,
@@ -3344,9 +3341,7 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
         onClose={() => setIsMysteryModalOpen(false)}
         user={user}
         onClaimSuccess={(amount, note) => {
-          if (onClaimSuccess) {
-            onClaimSuccess(amount, note);
-          }
+          if (onSettledReward) onSettledReward();
           loadRewardBackendData();
         }}
       />
