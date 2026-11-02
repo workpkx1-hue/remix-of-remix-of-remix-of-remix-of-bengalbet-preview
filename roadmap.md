@@ -1,5 +1,11 @@
 # Remaining work
 
+Current request (2026-11-02 05:41 UTC): implement the full report against the current DBServer, which the user explicitly identifies as a development/test server. Authorized controlled server code/config changes and financial checks on newly marked test accounts; never alter unrelated members. First establish protected backups of modified files, inspect current schema/contracts, then add missing reward-admin handlers and test browser readback. Do not claim the entire report implemented unless all release gates actually pass.
+- [ ] Inspect current server/schema and protect rollback copies before uploads.
+- [ ] Restore missing daily/VIP/rescue/promo/mystery admin contracts and verify frontend reads.
+- [ ] Test settings CRUD and member reward/wallet flows on isolated audit accounts, reverting temporary shared settings.
+- [ ] Complete remaining games/programs/permissions and release checks; unresolved scopes must remain explicit.
+
 Latest implementation request (2026-11-02 05:33 UTC): execute the report, improve admin settings/navigation, verify timed rewards, and simulate 30–60 days with 100 referred and 100 non-referred joins daily. Simulation must use an isolated clock/data environment, not thousands of production accounts; no unattended month-long monitoring is established by a chat turn.
 - [x] Restored BengalBet Server connection; live ping and file inventory HTTP 200; current mystery PHP read succeeded.
 - [x] Shared admin navigation; notice editor now has bilingual fields, enabled switch, image preview, explicit failure/loading feedback and save/readback verification. Real authenticated desktop/mobile reads succeeded; no settings were changed.
