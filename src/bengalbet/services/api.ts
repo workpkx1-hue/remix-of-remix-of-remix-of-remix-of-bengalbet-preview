@@ -446,6 +446,13 @@ export const api = {
   },
 
   rewards: {
+    chanceTable: (type: 'spin' | 'golden_egg' | 'red_envelope') =>
+      request<{ success: boolean; prizes: { label: string; amount: number }[] }>(`/api/rewards/table?type=${type}`),
+    playChance: (type: 'spin' | 'golden_egg' | 'red_envelope') =>
+      request<{ success: boolean; prize: { index: number; label: string; amount: number }; newBalance: number; user: any }>('/api/rewards/claim', { method: 'POST', body: JSON.stringify({ type }) }),
+    getChanceConfig: () => request<{ success: boolean; configured: boolean; config: Record<string, { label: string; amount: number; weight: number }[]> }>('/api/admin.php?section=chance-rewards&action=config'),
+    saveChanceConfig: (config: Record<string, { label: string; amount: number; weight: number }[]>) =>
+      request<{ success: boolean; config: any }>('/api/admin.php?section=chance-rewards&action=config', { method: 'POST', body: JSON.stringify(config) }),
     async claim(type: 'spin' | 'golden_egg' | 'red_envelope' | 'mission' | 'promo' | 'signin', amount: number, title?: string) {
       return request<{ success: boolean; message: string; newBalance: number; user: any }>('/api/rewards/claim', {
         method: 'POST',
