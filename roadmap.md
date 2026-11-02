@@ -9,8 +9,8 @@
 - [ ] Run regression checks and report evidence, failures and deployment readiness.
 
 New request: execute remaining checks and fixes; normalize the default server URL; provide convenient testing logins safely; send verified server changes through an authorized master API connection.
-- [ ] Normalize the default public API URL and check current configuration.
+- [x] Normalize the default public API URL and check current configuration (four automated tests passed; browser config verified).
 - [ ] Provide isolated demo login only if it cannot grant live account or administrator access; never expose a master key in frontend environment files.
-- [ ] Establish a secure authorized master API connection before live server modifications.
+- [x] Establish a secure authorized master API connection before live server modifications (read-only live health and API file inventory verified).
 
-Live changes require secure server access. Public master-key configuration and unauthenticated live one-click logins are excluded.
+Live VIP and daily-signin source inspected: VIP claims lack eligibility/duplicate checks; daily-signin displayed and credited amounts differ. Live code changes await a fresh protected backup and the revised security-first implementation plan. Public master-key configuration and unauthenticated live one-click logins are excluded.
