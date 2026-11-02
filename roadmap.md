@@ -1,14 +1,22 @@
 # Remaining work
 
-Latest request (2026-11-02 04:52 UTC): finish remaining safe checks and deliver a detailed Bengali A-to-Z current-status, site-flow, image and implementation plan as PDF and plain text. No permission to publish or change live funds/settings.
-- [ ] Finish fresh desktop/mobile read-only navigation and loaded-image checks; state any untested paths explicitly.
-- [ ] Consolidate all member/admin/program/asset findings with evidence levels and release gates.
-- [ ] Deliver matching PDF and plain-text reports; visually inspect every PDF page.
+- [x] Follow-up (2026-11-02 05:22 UTC): verified legacy admin login and users/settings/stats/feedbacks/transactions reads (HTTP 200); no credential in report/project files and no writes. VIP/Rewards/Referrals subtab checks remain unverified; login does not establish scoped admin or connector access.
+
+Latest request (2026-11-02 05:11 UTC): finish the previously incomplete Bengali PDF and plain-text reports, with fresh safe checks. No permission to publish or change live funds/settings.
+- [x] Rerun all 11 focused tests; verify public settings responds HTTP 200/success; open 11 guest paths on desktop/mobile, then recheck visible images after settling and dismissing notices on home/promotions/aviator/admin.
+- [x] Consolidate current member/program/admin source inventories and inspect 23 marketing artworks; separate prior authenticated observations from fresh guest checks.
+- [x] Generated matching version-2 Bengali PDF/plain text; inspected all 16 rendered PDF pages. Increased body text size after first review; no clipping/overlap found in final pass. Included fresh admin reads and explicit unverified financial/subtab flows.
+- Blocked: no accessible BengalBet Server connection in this workspace, no restored audit-member session, protected backup/staging/scoped admin not verified; authenticated admin writes and financial flows remain unverified.
+
+Earlier request (2026-11-02 04:52 UTC): finish remaining safe checks and deliver a detailed Bengali A-to-Z current-status, site-flow, image and implementation plan as PDF and plain text. No permission to publish or change live funds/settings.
+- [x] Finish available desktop/mobile guest navigation and loaded-image checks; authenticated paths and full-scroll images explicitly unverified.
+- [x] Consolidate all member/admin/program/asset findings with evidence levels and release gates.
+- [x] Deliver matching PDF and plain-text reports; visually inspect every PDF page.
 
 Latest request (2026-11-02 04:28 UTC): deliver a detailed Bangla full-site member-flow, image/banner, bonus-timing and publishing-readiness plan grounded in source, desktop/mobile browser observations and live data. This request is audit/planning only, not permission to deploy, claim bonuses or change balances/settings.
-- [ ] Inventory member pages, promotion promises, game programs and image sources with evidence.
+- [x] Inventory member pages, promotion promises, game programs and image sources with evidence.
 - [ ] Capture desktop and mobile guest/member flows and audit loaded images, errors and navigation.
-- [ ] Produce the detailed marketing/program alignment and prioritized publishing-readiness plan, clearly separating verified, code-only and untested findings.
+- [x] Produce the detailed marketing/program alignment and prioritized publishing-readiness plan, clearly separating verified, code-only and untested findings.
 
 Current approved sequence (2026-11-02): verify the five missing bonus administrator sections first, then isolated member reward/wallet checks. Read-only live checks and additive read handlers may proceed; financial mutations remain blocked until protected backup, isolated funds and scoped administrator access are available. Do not treat this sequence approval as permission to change real-member balances.
 Follow-up request: verify user-provided admin login and audit-member wallet. Completed actual legacy admin login (HTTP 200/session accepted) and member login, two matching balance reads of 500, wallet-card read, and successful welcome-ledger match; no money/config mutations. This does not clear the missing-handler, staging or scoped-admin blockers.
