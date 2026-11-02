@@ -1,5 +1,9 @@
 # Remaining work
 
+Current request: audit every member bonus, achievement, wallet gift/event and matching administrator controls; explain the actual promotion workflow; exercise authorized test-member flows in the browser and report discrepancies. Create at most one clearly marked test member, no existing-member impersonation or money/config mutations without safe isolation.
+- [ ] Produce a promotion/eligibility/control matrix from the code and verified live reads.
+- [ ] Exercise registration/login and read-only rewards/wallet flow with an explicitly marked new test member.
+
 Latest request: editable root environment configuration shared by user/admin panels, guest-accessible setup on connection failure, and PIN/one-click live logins. Implement the non-secret default URL configuration only; do not expose operational credentials or allow unauthenticated configuration changes/live account bypasses. Separate admin password login still requires protected server-side provisioning.
 - [x] Read the non-secret default DBServer URL from the root environment configuration and verify browser behavior (eight focused tests passed; browser default/reset and signed-out admin verified). The URL is intentionally public; no credential was written to environment files. Admin configuration changes remain browser-local, not writes to the deployed environment file.
 
