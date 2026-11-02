@@ -55,7 +55,7 @@ interface ExcludedTurnoverGame {
   exclusionPercent: string;
 }
 
-// Bets loaded directly from REST API (https://deserver.neexthub.site/dbserver/api/games.php?action=records)
+// Bets loaded directly from REST API (https://server.nexarofx.com/dbserver/api/games.php?action=records)
 
 
 // Comprehensive Excluded Turnover List matching Capture.PNG

@@ -286,7 +286,7 @@ export const GlobalDatabaseErrorBanner: React.FC<GlobalDatabaseErrorBannerProps>
                   type="text"
                   value={inputDomain}
                   onChange={(e) => setInputDomain(e.target.value)}
-                  placeholder="https://deserver.neexthub.site"
+                  placeholder="https://server.nexarofx.com"
                   className="w-full bg-[#1b1f24] border border-zinc-700 focus:border-amber-400 rounded-xl px-3.5 py-2.5 text-sm text-white font-mono outline-none transition"
                 />
               </div>

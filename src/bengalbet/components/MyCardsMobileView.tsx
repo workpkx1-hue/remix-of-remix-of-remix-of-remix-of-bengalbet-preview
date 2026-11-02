@@ -32,7 +32,7 @@ interface MyCardsMobileViewProps {
   showToast?: (message: string) => void;
 }
 
-// Bound wallets loaded exclusively from REST API (https://deserver.neexthub.site/dbserver/api/wallet.php?action=cards)
+// Bound wallets loaded exclusively from REST API (https://server.nexarofx.com/dbserver/api/wallet.php?action=cards)
 
 export const MyCardsMobileView: React.FC<MyCardsMobileViewProps> = ({
   user,
