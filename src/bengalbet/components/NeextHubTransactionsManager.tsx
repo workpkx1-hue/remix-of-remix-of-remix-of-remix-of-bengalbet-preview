@@ -1434,7 +1434,7 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
               {/* Mark Processing */}
               <button
                 type="button"
-                disabled={isSubmittingAction}
+                disabled
                 onClick={() => handleDetailedReviewSubmit('processing')}
                 className="py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
               >
@@ -1445,7 +1445,7 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
               {/* Flag Suspicious */}
               <button
                 type="button"
-                disabled={isSubmittingAction}
+                disabled
                 onClick={() => handleDetailedReviewSubmit('flagged')}
                 className="py-2.5 rounded-xl bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/40 font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
               >
@@ -1456,7 +1456,7 @@ export const NeextHubTransactionsManager: React.FC<NeextHubTransactionsManagerPr
               {/* Reject */}
               <button
                 type="button"
-                disabled={isSubmittingAction}
+                disabled={isSubmittingAction || !mayProcessPayment(selectedTxForReview)}
                 onClick={() => handleDetailedReviewSubmit('rejected')}
                 className="py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 cursor-pointer"
               >
