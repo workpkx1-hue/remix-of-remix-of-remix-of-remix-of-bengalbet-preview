@@ -1,5 +1,10 @@
 # Remaining work
 
+Latest request (2026-11-02 04:52 UTC): finish remaining safe checks and deliver a detailed Bengali A-to-Z current-status, site-flow, image and implementation plan as PDF and plain text. No permission to publish or change live funds/settings.
+- [ ] Finish fresh desktop/mobile read-only navigation and loaded-image checks; state any untested paths explicitly.
+- [ ] Consolidate all member/admin/program/asset findings with evidence levels and release gates.
+- [ ] Deliver matching PDF and plain-text reports; visually inspect every PDF page.
+
 Latest request (2026-11-02 04:28 UTC): deliver a detailed Bangla full-site member-flow, image/banner, bonus-timing and publishing-readiness plan grounded in source, desktop/mobile browser observations and live data. This request is audit/planning only, not permission to deploy, claim bonuses or change balances/settings.
 - [ ] Inventory member pages, promotion promises, game programs and image sources with evidence.
 - [ ] Capture desktop and mobile guest/member flows and audit loaded images, errors and navigation.
