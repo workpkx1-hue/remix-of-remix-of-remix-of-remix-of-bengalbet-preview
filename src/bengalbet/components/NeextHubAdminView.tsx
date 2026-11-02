@@ -250,24 +250,25 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
   }, [isAuthenticated]);
 
   // Handle PIN Login
-  const handlePinSubmit = (e: React.FormEvent) => {
+  const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pinInput === '222888' || pinInput === 'admin888' || pinInput === 'admin') {
-      setIsAuthenticated(true);
+    const key = pinInput.trim();
+    if (!key) return;
+    try {
+      const res = await fetch(`${REST_API_CONFIG.baseUrl}/admin.php?section=stats`, { headers: { 'X-Master-Key': key } });
+      if (!res.ok) throw new Error('bad');
+      REST_API_CONFIG.masterKey = key;
       sessionStorage.setItem('neexthub_admin_session', 'true');
+      setIsAuthenticated(true);
       setPinError('');
-    } else {
-      setPinError('ভুল পিন বা সিকিউরিটি কোড! সঠিক পিন: 222888');
+    } catch {
+      setPinError('ভুল অ্যাডমিন কী! আবার চেষ্টা করুন।');
     }
-  };
-
-  const handleQuickLogin = () => {
-    setIsAuthenticated(true);
-    sessionStorage.setItem('neexthub_admin_session', 'true');
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
+    REST_API_CONFIG.masterKey = '';
     sessionStorage.removeItem('neexthub_admin_session');
   };
 
@@ -654,7 +655,7 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
           <form onSubmit={handlePinSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-emerald-200 uppercase tracking-wider mb-2">
-                Security Access PIN
+                Admin Master Key
               </label>
               <div className="relative">
                 <input
@@ -664,7 +665,7 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
                     setPinInput(e.target.value);
                     setPinError('');
                   }}
-                  placeholder="Master PIN (Default: 222888)"
+                  placeholder="Admin Master Key"
                   className="w-full bg-[#051c13] border border-emerald-600/60 rounded-xl px-4 py-3.5 text-center text-lg tracking-widest text-white placeholder:text-gray-500 focus:outline-hidden focus:border-yellow-400 font-mono transition-colors"
                   autoFocus
                 />
@@ -685,14 +686,6 @@ export const NeextHubAdminView: React.FC<NeextHubAdminViewProps> = ({
               আনলক করুন (UNLOCK ADMIN)
             </button>
 
-            <button
-              type="button"
-              onClick={handleQuickLogin}
-              className="w-full py-2.5 rounded-xl bg-emerald-800/40 hover:bg-emerald-800/70 border border-emerald-500/40 text-emerald-200 text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <Zap className="w-3.5 h-3.5 text-yellow-400" />
-              ১-ক্লিক ডেমো লগইন (Quick Demo Access)
-            </button>
           </form>
 
           <div className="mt-6 pt-5 border-t border-emerald-800/50 flex items-center justify-between text-xs text-gray-400">

@@ -264,7 +264,7 @@ export default function App() {
         localStorage.setItem('bengalbet_user_session', JSON.stringify(user));
       } else {
         localStorage.removeItem('bengalbet_user_session');
-        localStorage.removeItem('bengalbet_user_session');
+        localStorage.removeItem('bengalbet_auth_token');
       }
     } catch (e) {
       console.error('Error saving user to localStorage cache', e);
