@@ -1,13 +1,13 @@
 # Remaining work
 
 Current approved sequence (2026-11-02): verify the five missing bonus administrator sections first, then isolated member reward/wallet checks. Read-only live checks and additive read handlers may proceed; financial mutations remain blocked until protected backup, isolated funds and scoped administrator access are available. Do not treat this sequence approval as permission to change real-member balances.
-- [ ] Reproduce all five administrator failures against the newly linked connection.
+- [x] Reproduce all five administrator failures against the newly linked connection (all five return 404 on 2026-11-02).
 - [ ] Restore safe administrator reads where current schema/contracts permit, with focused regression checks.
-- [ ] Verify member reward views in the live browser and document claim/settings blockers accurately.
+- [x] Verify browser registration/login and member status reads; isolated mystery rendering rejects an ineligible member. Claim/settings blockers and marketing discrepancies recorded in bonus-audit.md. Ordinary navigation through every reward view remains unverified.
 
 Current request: audit every member bonus, achievement, wallet gift/event and matching administrator controls; explain the actual promotion workflow; exercise authorized test-member flows in the browser and report discrepancies. Create at most one clearly marked test member, no existing-member impersonation or money/config mutations without safe isolation.
-- [ ] Produce a promotion/eligibility/control matrix from the code and verified live reads.
-- [ ] Exercise registration/login and read-only rewards/wallet flow with an explicitly marked new test member.
+- [x] Produce the five-feature promotion/eligibility/control matrix from current PHP source and live reads in bonus-audit.md; other promotion types remain open.
+- [x] Exercise registration/login and read-only rewards/wallet flow with one new isolated audit member (2026-11-02); balance remains 500, no rewards claimed.
 
 Latest request: editable root environment configuration shared by user/admin panels, guest-accessible setup on connection failure, and PIN/one-click live logins. Implement the non-secret default URL configuration only; do not expose operational credentials or allow unauthenticated configuration changes/live account bypasses. Separate admin password login still requires protected server-side provisioning.
 - [x] Read the non-secret default DBServer URL from the root environment configuration and verify browser behavior (eight focused tests passed; browser default/reset and signed-out admin verified). The URL is intentionally public; no credential was written to environment files. Admin configuration changes remain browser-local, not writes to the deployed environment file.
