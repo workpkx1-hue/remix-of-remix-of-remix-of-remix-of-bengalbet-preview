@@ -1,7 +1,14 @@
 <?php
 /** Read-only reward admin contracts. Invoked by authenticated admin.php. */
 Database::requireAdmin();
-if ($method !== 'GET') Database::errorResponse('This reward operation is not implemented; no changes were made.', 405);
+require_once __DIR__ . '/daily_signin_rules.php';
+if ($section === 'daily-signin' && $action === 'config' && $method === 'POST') {
+    try { $config=bbSigninValidatedConfig($input); }
+    catch(InvalidArgumentException $e) { Database::errorResponse($e->getMessage(),422); }
+    Database::execute('INSERT INTO daily_signin_config (id,config_json) VALUES (1,?) ON DUPLICATE KEY UPDATE config_json=VALUES(config_json)',[json_encode($config,JSON_UNESCAPED_UNICODE)]);
+    Database::jsonResponse(['success'=>true,'message'=>'Daily configuration saved','config'=>$config]);
+}
+if ($method !== 'GET') Database::errorResponse('This reward operation is not implemented; no changes were made.',405);
 function bbRewardRow(array $row): array {
     $out = [];
     foreach ($row as $key => $value) {

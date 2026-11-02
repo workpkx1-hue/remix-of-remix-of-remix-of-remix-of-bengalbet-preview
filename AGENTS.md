@@ -17,4 +17,5 @@
 - Keep notice editing in AdminSiteContent and confirm saves through settingsPersistence readback; a successful write response alone does not establish persisted member-visible settings.
 - Derive all administrator navigation surfaces from one tab list to preserve access and consistent labels.
 
-- Completed server daily-signin settlements notify the parent through onSettledReward for read-only wallet refresh; never forward them to the generic reward-claim callback, which would credit twice.
+- Completed server reward settlements notify the parent through onSettledReward for read-only wallet refresh; never forward them to the generic reward-claim callback, which would credit twice.
+- Keep external PHP reward-source mirrors under server/dbserver/api for review; they are not the TanStack app runtime and live uploads require authenticated connector operations.
