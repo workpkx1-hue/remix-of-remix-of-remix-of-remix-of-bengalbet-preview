@@ -186,6 +186,9 @@ export const NeextHubAdminRewardsManager: React.FC<NeextHubAdminRewardsManagerPr
       if (tiersRes.success) setRescueTiers(tiersRes.tiers);
       if (claimsRes.success) setRescueClaims(claimsRes.claims);
     } catch (e: any) {
+      setRescueTiers([]);
+      setRescueClaims([]);
+      showToast('রেসকিউ সেটিংস ও রেকর্ড লোড হয়নি। আবার চেষ্টা করুন।');
       console.error('Rescue load error:', e);
     } finally {
       setIsLoading(false);
@@ -296,6 +299,9 @@ export const NeextHubAdminRewardsManager: React.FC<NeextHubAdminRewardsManagerPr
       if (promosRes.success) setPromos(promosRes.promos);
       if (redRes.success) setPromoRedemptions(redRes.redemptions);
     } catch (e: any) {
+      setPromos([]);
+      setPromoRedemptions([]);
+      showToast('প্রোমো সেটিংস ও রেকর্ড লোড হয়নি। আবার চেষ্টা করুন।');
       console.error('Promo load error:', e);
     } finally {
       setIsLoading(false);
@@ -510,6 +516,9 @@ export const NeextHubAdminRewardsManager: React.FC<NeextHubAdminRewardsManagerPr
         setMysteryCards(cardsRes.cards);
       }
     } catch (e: any) {
+      setMysteryConfig(null);
+      setMysteryCards([]);
+      showToast('মিস্ট্রি পুরস্কারের সেটিংস ও রেকর্ড লোড হয়নি। আবার চেষ্টা করুন।');
       console.error('Mystery reward load error:', e);
     } finally {
       setIsLoading(false);
