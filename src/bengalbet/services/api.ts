@@ -14,7 +14,7 @@ const getInitialConfig = () => {
     if (saved) {
       const parsed = JSON.parse(saved);
       return {
-        rootDomain: (parsed.rootDomain || 'https://server.nexarofx.com').replace(/\/+$/, ''),
+        rootDomain: ((parsed.rootDomain && !String(parsed.rootDomain).includes('neexthub')) ? parsed.rootDomain : 'https://server.nexarofx.com').replace(/\/+$/, ''),
         path: parsed.path !== undefined ? parsed.path : '/dbserver',
         masterKey: parsed.masterKey || 'bengalbet_master_secret_2026_xyz99'
       };
