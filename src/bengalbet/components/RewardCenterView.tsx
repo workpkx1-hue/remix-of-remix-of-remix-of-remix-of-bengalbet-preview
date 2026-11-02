@@ -46,6 +46,7 @@ interface RewardCenterViewProps {
   onOpenMysteryReward?: () => void;
   onClaimCoupon?: (couponId: number, name: string) => void;
   onClaimSuccess?: (amount: number, title: string) => void;
+  onSettledReward?: () => void;
   onOpenInvite?: () => void;
   onOpenVip?: () => void;
   onBack?: () => void;
@@ -213,6 +214,7 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
   onOpenMysteryReward,
   onClaimCoupon,
   onClaimSuccess,
+  onSettledReward,
   onOpenInvite,
   onOpenVip,
   onBack,
@@ -563,7 +565,7 @@ export const RewardCenterView: React.FC<RewardCenterViewProps> = ({
       setSigninEligible(false);
       setSignedDays(prev => Array.from(new Set([...prev, res.dayNumber])));
       setSigninStreak(res.streak);
-      if (onClaimSuccess) onClaimSuccess(res.bonus, `দিন ${res.dayNumber} সাইন-ইন বোনাস (+৳${res.bonus.toFixed(2)})`);
+      if (onSettledReward) onSettledReward();
       await loadRewardBackendData();
       confetti({ particleCount: 65, spread: 70, origin: { y: 0.5 } });
     } catch (e: any) {
